@@ -405,6 +405,11 @@ class HomeView extends StatelessWidget {
     );
     var startTime = initialStart.obs;
     var endTime = initialStart.add(const Duration(minutes: 60)).obs;
+    // 🎯 시작 시간이 변경될 때마다 실행될 마법의 코드
+    ever(startTime, (DateTime newStart) {
+      // 종료 시간을 시작 시간보다 1시간 뒤로 자동 설정
+      endTime.value = newStart.add(const Duration(minutes: 60));
+    });
     var selectedDays = <int>[DateTime.now().weekday].obs;
     var selectedIcon = '국어'.obs;
     var selectedColor = HomeView.pastelColors[0].obs;
@@ -620,8 +625,14 @@ class HomeView extends StatelessWidget {
     final titleController = TextEditingController(text: schedule.title);
     var startTime = schedule.startTime.obs;
     var endTime = schedule.endTime.obs;
+    // 🎯 시작 시간이 변경될 때마다 실행될 마법의 코드
+    ever(startTime, (DateTime newStart) {
+      // 종료 시간을 시작 시간보다 1시간 뒤로 자동 설정
+      endTime.value = newStart.add(const Duration(minutes: 60));
+    });
     var selectedDay = schedule.dayOfWeek.obs;
     var selectedIcon = (schedule.iconName ?? '국어').obs;
+    var selectedColor = (Color(schedule.colorValue)).obs;
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -677,6 +688,32 @@ class HomeView extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: HomeView.pastelColors.map((color) {
+                    return GestureDetector(
+                      onTap: () => selectedColor.value = color,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            // 진한 회색 테두리 적용
+                            color: selectedColor.value == color
+                                ? Colors.grey[400]!
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Obx(
                 () => Wrap(
                   spacing: 7,
                   children: List.generate(
@@ -720,6 +757,7 @@ class HomeView extends StatelessWidget {
                   schedule.endTime = endTime.value;
                   schedule.dayOfWeek = selectedDay.value;
                   schedule.iconName = selectedIcon.value;
+                  schedule.colorValue = selectedColor.value.value;
                   schedule.save().then((_) => controller.schedules.refresh());
                   Get.back();
                 },
