@@ -433,6 +433,7 @@ class HomeView extends StatelessWidget {
     var selectedDays = <int>[DateTime.now().weekday].obs;
     var selectedIcon = '국어'.obs;
     var selectedColor = HomeView.pastelColors[0].obs;
+    final List<String> iconKeys = HomeView.academyImages.keys.toList();
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -463,27 +464,48 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
-              Obx(
-                () => Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: academyImages.keys
-                      .map(
-                        (name) => GestureDetector(
+              Container(
+                height: 150, // 👈 딱 이만큼만 높이를 쓰라고 강제로 못 박습니다.
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[50], // 영역 구분을 위해 아주 연한 회색 배경
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: SingleChildScrollView(
+                  // 👈 복잡한 격자 계산 대신 단순 스크롤 사용
+                  padding: const EdgeInsets.all(10),
+                  child: Obx(
+                    () => Wrap(
+                      spacing: 12,
+                      runSpacing: 1,
+                      alignment: WrapAlignment.center,
+                      children: iconKeys.map((name) {
+                        // 👈 위에서 선언한 iconKeys 사용
+                        final isSelected = selectedIcon.value == name;
+                        return GestureDetector(
                           onTap: () => selectedIcon.value = name,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: selectedIcon.value == name
+                              color: isSelected
                                   ? AppColors.mainPurple
-                                  : Colors.grey[100],
+                                  : Colors.white,
                               shape: BoxShape.circle,
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                      ),
+                                    ]
+                                  : [],
                             ),
-                            child: _buildAcademyIcon(name, size: 50),
+                            child: _buildAcademyIcon(name, size: 60),
                           ),
-                        ),
-                      )
-                      .toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ),
 
@@ -655,6 +677,7 @@ class HomeView extends StatelessWidget {
     var selectedDay = schedule.dayOfWeek.obs;
     var selectedIcon = (schedule.iconName ?? '국어').obs;
     var selectedColor = (Color(schedule.colorValue)).obs;
+    final List<String> iconKeys = HomeView.academyImages.keys.toList();
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -685,27 +708,48 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
-              Obx(
-                () => Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: academyImages.keys
-                      .map(
-                        (name) => GestureDetector(
+              Container(
+                height: 150, // 👈 딱 이만큼만 높이를 쓰라고 강제로 못 박습니다.
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[50], // 영역 구분을 위해 아주 연한 회색 배경
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: SingleChildScrollView(
+                  // 👈 복잡한 격자 계산 대신 단순 스크롤 사용
+                  padding: const EdgeInsets.all(10),
+                  child: Obx(
+                    () => Wrap(
+                      spacing: 12,
+                      runSpacing: 1,
+                      alignment: WrapAlignment.center,
+                      children: iconKeys.map((name) {
+                        // 👈 위에서 선언한 iconKeys 사용
+                        final isSelected = selectedIcon.value == name;
+                        return GestureDetector(
                           onTap: () => selectedIcon.value = name,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: selectedIcon.value == name
+                              color: isSelected
                                   ? AppColors.mainPurple
-                                  : Colors.grey[100],
+                                  : Colors.white,
                               shape: BoxShape.circle,
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                      ),
+                                    ]
+                                  : [],
                             ),
-                            child: _buildAcademyIcon(name, size: 50),
+                            child: _buildAcademyIcon(name, size: 60),
                           ),
-                        ),
-                      )
-                      .toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
