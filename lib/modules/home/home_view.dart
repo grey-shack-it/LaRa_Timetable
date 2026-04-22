@@ -24,6 +24,7 @@ class HomeView extends StatelessWidget {
     '피아노': 'ic_piano.png',
     '독서': 'ic_read.png',
     '과학': 'ic_science.png',
+    '학교': 'ic_school.png',
   };
 
   static const List<Color> pastelColors = [
@@ -476,9 +477,9 @@ class HomeView extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   child: Obx(
                     () => Wrap(
-                      spacing: 12,
+                      spacing: 20,
                       runSpacing: 1,
-                      alignment: WrapAlignment.center,
+                      alignment: WrapAlignment.start,
                       children: iconKeys.map((name) {
                         // 👈 위에서 선언한 iconKeys 사용
                         final isSelected = selectedIcon.value == name;
@@ -500,7 +501,7 @@ class HomeView extends StatelessWidget {
                                     ]
                                   : [],
                             ),
-                            child: _buildAcademyIcon(name, size: 60),
+                            child: _buildAcademyIcon(name, size: 65),
                           ),
                         );
                       }).toList(),
@@ -720,9 +721,9 @@ class HomeView extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   child: Obx(
                     () => Wrap(
-                      spacing: 12,
+                      spacing: 20,
                       runSpacing: 1,
-                      alignment: WrapAlignment.center,
+                      alignment: WrapAlignment.start,
                       children: iconKeys.map((name) {
                         // 👈 위에서 선언한 iconKeys 사용
                         final isSelected = selectedIcon.value == name;
@@ -744,7 +745,7 @@ class HomeView extends StatelessWidget {
                                     ]
                                   : [],
                             ),
-                            child: _buildAcademyIcon(name, size: 60),
+                            child: _buildAcademyIcon(name, size: 65),
                           ),
                         );
                       }).toList(),
