@@ -53,6 +53,7 @@ class HomeController extends GetxController {
     int day,
     String memo,
     String iconName,
+    int colorValue,
   ) {
     var box = Hive.box<Schedule>('schedules');
     final newSchedule = Schedule(
@@ -62,6 +63,7 @@ class HomeController extends GetxController {
       dayOfWeek: day,
       memo: memo,
       iconName: iconName,
+      colorValue: colorValue,
     );
 
     box.add(newSchedule); // 1. Hive 저장

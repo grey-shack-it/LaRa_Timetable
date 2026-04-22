@@ -26,6 +26,15 @@ class HomeView extends StatelessWidget {
     '과학': 'ic_science.png',
   };
 
+  static const List<Color> pastelColors = [
+    Color(0xFFC09FF8), // 보라 (기존)
+    Color(0xFFFFF59D), // 노랑
+    Color(0xFFFFCCBC), // 주황
+    Color(0xFFFFAB91), // 빨강
+    Color(0xFFA5D6A7), // 초록
+    Color(0xFF90CAF9), // 파랑
+  ];
+
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.put(
@@ -398,6 +407,7 @@ class HomeView extends StatelessWidget {
     var endTime = initialStart.add(const Duration(minutes: 60)).obs;
     var selectedDays = <int>[DateTime.now().weekday].obs;
     var selectedIcon = '국어'.obs;
+    var selectedColor = HomeView.pastelColors[0].obs;
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -430,8 +440,8 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 15),
               Obx(
                 () => Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                  spacing: 10,
+                  runSpacing: 10,
                   children: academyImages.keys
                       .map(
                         (name) => GestureDetector(
@@ -451,6 +461,34 @@ class HomeView extends StatelessWidget {
                       .toList(),
                 ),
               ),
+
+              const SizedBox(height: 20),
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: pastelColors.map((color) {
+                    return GestureDetector(
+                      onTap: () => selectedColor.value = color,
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          // 선택된 색상에만 검정색 테두리(두께 3)를 줘서 "선택됨" 표시
+                          border: Border.all(
+                            color: selectedColor.value == color
+                                ? Colors.grey[400]!
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 20),
               const SizedBox(height: 20),
               Obx(
                 () => Wrap(
@@ -512,6 +550,7 @@ class HomeView extends StatelessWidget {
                       day,
                       "", // 메모
                       selectedIcon.value,
+                      selectedColor.value.value, // 선택된 색상값 추가
                     );
                   }
                   Get.back();

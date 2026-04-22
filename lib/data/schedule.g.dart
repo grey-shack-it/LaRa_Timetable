@@ -23,13 +23,14 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       dayOfWeek: fields[3] as int,
       memo: fields[5] as String,
       iconName: fields[4] as String?,
+      colorValue: fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Schedule obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       ..writeByte(4)
       ..write(obj.iconName)
       ..writeByte(5)
-      ..write(obj.memo);
+      ..write(obj.memo)
+      ..writeByte(6)
+      ..write(obj.colorValue);
   }
 
   @override
