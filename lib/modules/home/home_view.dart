@@ -94,8 +94,21 @@ class HomeView extends StatelessWidget {
                         child: Column(
                           children: List.generate(
                             totalHours,
-                            (i) => SizedBox(
+                            (i) => Container(
+                              // 🎯 SizedBox를 Container로 변경
                               height: 60,
+                              decoration: BoxDecoration(
+                                // 🎯 테두리 선 추가
+                                border: Border(
+                                  bottom: BorderSide(
+                                    // 일정표 안의 선과 색상/두께를 맞추는 게 중요합니다!
+                                    color: AppColors.gridLine.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                    width: 0.8,
+                                  ),
+                                ),
+                              ),
                               child: Center(
                                 child: Text(
                                   '${start + i}시',
@@ -338,6 +351,13 @@ class HomeView extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
                   decoration: TextDecoration.none,
+                  shadows: [
+                    Shadow(
+                      color: Color.fromARGB(255, 99, 98, 98),
+                      offset: Offset(0.5, 0.5),
+                      blurRadius: 3.0,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -445,8 +465,8 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 15),
               Obx(
                 () => Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: academyImages.keys
                       .map(
                         (name) => GestureDetector(
@@ -459,7 +479,7 @@ class HomeView extends StatelessWidget {
                                   : Colors.grey[100],
                               shape: BoxShape.circle,
                             ),
-                            child: _buildAcademyIcon(name, size: 60),
+                            child: _buildAcademyIcon(name, size: 50),
                           ),
                         ),
                       )
@@ -475,8 +495,8 @@ class HomeView extends StatelessWidget {
                     return GestureDetector(
                       onTap: () => selectedColor.value = color,
                       child: Container(
-                        width: 35,
-                        height: 35,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: color,
                           shape: BoxShape.circle,
@@ -493,8 +513,7 @@ class HomeView extends StatelessWidget {
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 20),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Obx(
                 () => Wrap(
                   spacing: 7,
@@ -524,6 +543,7 @@ class HomeView extends StatelessWidget {
                 trailing: Obx(
                   () => Text(
                     '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 onTap: () =>
@@ -534,6 +554,7 @@ class HomeView extends StatelessWidget {
                 trailing: Obx(
                   () => Text(
                     '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 onTap: () =>
@@ -570,6 +591,7 @@ class HomeView extends StatelessWidget {
                 child: const Text(
                   '일정 등록',
                   style: TextStyle(
+                    fontSize: 16,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -679,7 +701,7 @@ class HomeView extends StatelessWidget {
                                   : Colors.grey[100],
                               shape: BoxShape.circle,
                             ),
-                            child: _buildAcademyIcon(name, size: 60),
+                            child: _buildAcademyIcon(name, size: 50),
                           ),
                         ),
                       )
@@ -712,7 +734,7 @@ class HomeView extends StatelessWidget {
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Obx(
                 () => Wrap(
                   spacing: 7,
@@ -734,6 +756,7 @@ class HomeView extends StatelessWidget {
                 trailing: Obx(
                   () => Text(
                     '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 onTap: () =>
@@ -744,6 +767,7 @@ class HomeView extends StatelessWidget {
                 trailing: Obx(
                   () => Text(
                     '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 onTap: () =>
@@ -771,6 +795,7 @@ class HomeView extends StatelessWidget {
                 child: const Text(
                   '수정 완료',
                   style: TextStyle(
+                    fontSize: 16,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

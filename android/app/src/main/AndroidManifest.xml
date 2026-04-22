@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="my_timeline_app"
+        android:label="아이들 일정"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
