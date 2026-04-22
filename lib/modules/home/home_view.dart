@@ -38,7 +38,7 @@ class HomeView extends StatelessWidget {
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
         title: const Text(
-          '아이들 학원 스케줄러',
+          '아이들 일정 관리',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             color: AppColors.darkPurple,
@@ -411,7 +411,7 @@ class HomeView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                '학원 일정 추가',
+                '일정 추가',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -421,8 +421,9 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 15),
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: '학원 이름',
+                decoration: InputDecoration(
+                  hintText: '일정을 입력해주세요',
+                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -605,8 +606,9 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 15),
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: '학원 이름',
+                decoration: InputDecoration(
+                  hintText: '일정을 입력해주세요',
+                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   border: OutlineInputBorder(),
                 ),
               ),
