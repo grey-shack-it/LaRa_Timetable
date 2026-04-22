@@ -534,6 +534,7 @@ class HomeView extends StatelessWidget {
           ),
         ),
       ),
+      isScrollControlled: true,
     );
   }
 
@@ -583,6 +584,7 @@ class HomeView extends StatelessWidget {
     var selectedIcon = (schedule.iconName ?? '국어').obs;
     Get.bottomSheet(
       Container(
+        height: MediaQuery.of(context).size.height * 0.75,
         padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -699,6 +701,7 @@ class HomeView extends StatelessWidget {
           ),
         ),
       ),
+      isScrollControlled: true,
     );
   }
 
