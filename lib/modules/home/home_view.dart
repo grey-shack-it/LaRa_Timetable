@@ -310,7 +310,7 @@ class HomeView extends StatelessWidget {
     double iconSize = height < 50 ? 28.0 : (height < 70 ? 40.0 : 52.0);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.mainPurple,
+        color: Color(schedule.colorValue),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
