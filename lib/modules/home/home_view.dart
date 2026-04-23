@@ -340,23 +340,23 @@ class HomeView extends StatelessWidget {
             ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                schedule.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  decoration: TextDecoration.none,
-                  shadows: [
-                    Shadow(
-                      color: Color.fromARGB(255, 99, 98, 98),
-                      offset: Offset(0.5, 0.5),
-                      blurRadius: 3.0,
-                    ),
-                  ],
-                ),
+            child: Text(
+              schedule.title,
+              textAlign: TextAlign.center,
+              maxLines: 2, // 최대 2줄까지 줄바꿈
+              overflow: TextOverflow.ellipsis, // 넘치면 '...'
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                decoration: TextDecoration.none,
+                shadows: [
+                  Shadow(
+                    color: Color.fromARGB(255, 99, 98, 98),
+                    offset: Offset(0.5, 0.5),
+                    blurRadius: 3.0,
+                  ),
+                ],
               ),
             ),
           ),
