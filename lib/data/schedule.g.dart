@@ -23,7 +23,10 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       dayOfWeek: fields[3] as int,
       memo: fields[5] as String,
       iconName: fields[4] as String?,
-      colorValue: fields[6] as int,
+      // ignore: dead_code
+      colorValue:
+          fields[6] as int ??
+          0xFFC09FF8, // colorValue는 필수로 읽어오도록 하고, 없으면 기본값 사용
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 // [주의] 아래 경로는 실제 파일 위치와 정확히 일치해야 합니다!
 import 'data/schedule.dart';
 import 'modules/home/home_view.dart';
+// ignore: unused_import
 import 'modules/home/home_controller.dart';
 
 class AppColors {
