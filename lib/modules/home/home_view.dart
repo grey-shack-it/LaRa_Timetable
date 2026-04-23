@@ -296,15 +296,12 @@ class HomeView extends StatelessWidget {
         data: schedule,
         feedback: Material(
           color: Colors.transparent,
-          child: Container(
-            width: 50,
-            height: blockHeight,
-            decoration: BoxDecoration(
-              color: AppColors.mainPurple.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Center(
-              child: Icon(Icons.touch_app, color: Colors.white, size: 20),
+          child: Opacity(
+            opacity: 0.85,
+            child: SizedBox(
+              width: 44, // 블록 너비 (left:2, right:2 여백 감안)
+              height: blockHeight,
+              child: _buildBlockDesign(schedule, blockHeight),
             ),
           ),
         ),
@@ -644,20 +641,6 @@ class HomeView extends StatelessWidget {
                     selectedIcon.value,
                     selectedColor.value,
                   );
-                  Get.back();
-
-                  // 2. 선택된 모든 요일에 대해 일정 추가
-                  for (var day in selectedDays) {
-                    controller.addSchedule(
-                      title,
-                      startTime.value,
-                      endTime.value,
-                      day,
-                      "", // 메모
-                      selectedIcon.value,
-                      selectedColor.value.value, // 선택된 색상값 추가
-                    );
-                  }
                   Get.back();
                 },
                 style: ElevatedButton.styleFrom(
