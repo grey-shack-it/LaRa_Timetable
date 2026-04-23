@@ -30,7 +30,7 @@ class Schedule extends HiveObject {
     required this.startTime,
     required this.endTime,
     required this.dayOfWeek,
-    required this.memo, // 👈 필수 항목으로 추가
+    this.memo = '', // 👈 필수 항목으로 추가
     this.iconName,
     this.colorValue = 0xFFC09FF8, // 기본값은 기존 보라색으로 설정
   });
