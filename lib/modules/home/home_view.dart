@@ -77,9 +77,62 @@ class HomeView extends StatelessWidget {
                     ...controller.profiles.map((profile) {
                       final isSelected =
                           controller.selectedChildId.value == profile.id;
+                      // ✅ 겹쳐보기 중엔 탭 비활성화 (흐리게)
+                      final isDisabled = controller.isOverlapView.value;
                       return GestureDetector(
+                        onTap: isDisabled
+                            ? null
+                            : () {
+                                controller.selectedChildId.value = profile.id;
+                                controller.refreshUI();
+                              },
+                        child: Opacity(
+                          opacity: isDisabled ? 0.4 : 1.0,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 8,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected && !isDisabled
+                                  ? AppColors.mainPurple
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.darkPurple.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              profile.name,
+                              style: TextStyle(
+                                color: isSelected && !isDisabled
+                                    ? Colors.white
+                                    : AppColors.darkPurple,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+
+                    // ✅ 겹쳐보기 버튼
+                    Obx(
+                      () => GestureDetector(
                         onTap: () {
-                          controller.selectedChildId.value = profile.id;
+                          controller.isOverlapView.value =
+                              !controller.isOverlapView.value;
                           controller.refreshUI();
                         },
                         child: Container(
@@ -88,12 +141,12 @@ class HomeView extends StatelessWidget {
                             vertical: 8,
                           ),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
+                            horizontal: 14,
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.mainPurple
+                            color: controller.isOverlapView.value
+                                ? AppColors.darkPurple
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
@@ -106,19 +159,31 @@ class HomeView extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Text(
-                            profile.name,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.darkPurple,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.people_alt,
+                                size: 16,
+                                color: controller.isOverlapView.value
+                                    ? Colors.white
+                                    : AppColors.darkPurple,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '한눈에',
+                                style: TextStyle(
+                                  color: controller.isOverlapView.value
+                                      ? Colors.white
+                                      : AppColors.darkPurple,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -230,7 +295,7 @@ class HomeView extends StatelessWidget {
                                         children: [
                                           _buildGridLines(totalHours),
                                           // 해당 요일 일정만 표시 (좌표는 start 시간에 맞춰 - 처리)
-                                          ...controller.currentSchedules
+                                          ...controller.displaySchedules
                                               .where(
                                                 (s) => s.dayOfWeek == dayNum,
                                               )
@@ -368,13 +433,24 @@ class HomeView extends StatelessWidget {
             ),
           ),
         ),
-        childWhenDragging: Opacity(
-          opacity: 0.3,
-          child: _buildBlockDesign(schedule, blockHeight),
-        ),
+        childWhenDragging: Obx(() {
+          final isOverlap = controller.isOverlapView.value;
+          final hasConflict = controller.isOverlappingWithOthers(schedule);
+          return Opacity(
+            opacity: isOverlap && hasConflict ? 0.55 : 0.3,
+            child: _buildBlockDesign(schedule, blockHeight),
+          );
+        }),
         child: GestureDetector(
           onTap: () => _showEditOrDeleteDialog(context, controller, schedule),
-          child: _buildBlockDesign(schedule, blockHeight),
+          child: Obx(() {
+            final isOverlap = controller.isOverlapView.value;
+            final hasConflict = controller.isOverlappingWithOthers(schedule);
+            return Opacity(
+              opacity: isOverlap && hasConflict ? 0.75 : 1.0,
+              child: _buildBlockDesign(schedule, blockHeight),
+            );
+          }),
         ),
       ),
     );
@@ -382,50 +458,95 @@ class HomeView extends StatelessWidget {
 
   Widget _buildBlockDesign(Schedule schedule, double height) {
     double iconSize = height < 50 ? 28.0 : (height < 70 ? 40.0 : 52.0);
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(schedule.colorValue),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.darkPurple.withValues(alpha: 0.3),
-            blurRadius: 4,
-            offset: const Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (schedule.iconName != null)
-            Flexible(
-              child: _buildAcademyIcon(schedule.iconName!, size: iconSize),
+    final controller = Get.find<HomeController>();
+
+    return Obx(() {
+      final isOverlap = controller.isOverlapView.value;
+      final profileColor = controller.getProfileColor(schedule.childId);
+      final profileName = controller.getProfileName(schedule.childId);
+
+      return Container(
+        decoration: BoxDecoration(
+          color: Color(schedule.colorValue),
+          borderRadius: BorderRadius.circular(12),
+          // ✅ 겹쳐보기일 때 아이별 테두리 색상 표시
+          border: isOverlap && controller.isOverlappingWithOthers(schedule)
+              ? Border.all(color: AppColors.darkPurple, width: 2.5)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.darkPurple.withValues(alpha: 0.3),
+              blurRadius: 4,
+              offset: const Offset(2, 2),
             ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              schedule.title,
-              textAlign: TextAlign.center,
-              maxLines: 2, // 최대 2줄까지 줄바꿈
-              overflow: TextOverflow.ellipsis, // 넘치면 '...'
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                decoration: TextDecoration.none,
-                shadows: [
-                  Shadow(
-                    color: Color.fromARGB(255, 99, 98, 98),
-                    offset: Offset(0.5, 0.5),
-                    blurRadius: 3.0,
+          ],
+        ),
+        child: Stack(
+          children: [
+            // 기존 아이콘 + 제목
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (schedule.iconName != null)
+                  Flexible(
+                    child: _buildAcademyIcon(
+                      schedule.iconName!,
+                      size: iconSize,
+                    ),
                   ),
-                ],
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    schedule.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      decoration: TextDecoration.none,
+                      shadows: [
+                        Shadow(
+                          color: Color.fromARGB(255, 99, 98, 98),
+                          offset: Offset(0.5, 0.5),
+                          blurRadius: 3.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+            // ✅ 겹쳐보기일 때만 이름 뱃지 표시
+            if (isOverlap)
+              Positioned(
+                top: 3,
+                left: 3,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: profileColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    profileName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w900,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    });
   }
 
   // --- 기존 아이콘 및 다이얼로그 로직은 동일 (생략) ---

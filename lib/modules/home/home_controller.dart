@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/schedule.dart';
+import 'package:flutter/material.dart';
 
 class ChildProfile {
   String id;
@@ -22,6 +23,40 @@ class HomeController extends GetxController {
     ChildProfile(id: 'default', name: '첫째'), // 기본 프로필
   ].obs;
   final RxString selectedChildId = 'default'.obs;
+  final RxBool isOverlapView = false.obs;
+
+  static const List<Color> profileColors = [
+    Color(0xFF42A5F5),
+    Color(0xFFEF5350),
+    Color(0xFF66BB6A),
+    Color(0xFFFF7043),
+    Color(0xFFAB47BC),
+  ];
+
+  Color getProfileColor(String childId) {
+    final index = profiles.indexWhere((p) => p.id == childId);
+    if (index < 0) return profileColors[0];
+    return profileColors[index % profileColors.length];
+  }
+
+  String getProfileName(String childId) {
+    final profile = profiles.firstWhereOrNull((p) => p.id == childId);
+    return profile?.name ?? '';
+  }
+
+  bool isOverlappingWithOthers(Schedule target) {
+    return schedules.any((s) {
+      if (s == target) return false; // 자기 자신 제외
+      if (s.childId == target.childId) return false; // 같은 아이 제외
+      if (s.dayOfWeek != target.dayOfWeek) return false; // 다른 요일 제외
+      // 시간 겹침 확인
+      return target.startTime.isBefore(s.endTime) &&
+          target.endTime.isAfter(s.startTime);
+    });
+  }
+
+  List<Schedule> get displaySchedules =>
+      isOverlapView.value ? schedules.toList() : currentSchedules;
 
   // 현재 선택된 아이의 일정만 필터링
   List<Schedule> get currentSchedules =>
@@ -72,8 +107,8 @@ class HomeController extends GetxController {
     int min = 7;
     int max = 21;
 
-    for (var s in currentSchedules) {
-      // ✅ currentSchedules로 변경
+    for (var s in displaySchedules) {
+      // ✅ displaySchedules로 변경
       if (s.startTime.hour < min) min = s.startTime.hour;
       int endH = s.endTime.hour;
       if (s.endTime.minute > 0) endH++;
