@@ -19,9 +19,6 @@ void main() async {
   Hive.registerAdapter(ScheduleAdapter());
   await Hive.openBox<Schedule>('schedules');
 
-  // 🎯 [추가] 앱 시작 전 컨트롤러를 미리 한 번만 태워둡니다.
-  Get.put(HomeController());
-
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
