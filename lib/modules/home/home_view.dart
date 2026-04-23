@@ -57,11 +57,72 @@ class HomeView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
+        actions: [
+          // ✅ 프로필 편집 아이콘
+          IconButton(
+            icon: const Icon(Icons.people, color: AppColors.darkPurple),
+            onPressed: () => _showProfileEditSheet(context, controller),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
-          // 🎯 전체를 Column으로 묶어 상단 요일 고정
           children: [
+            // ✅ 프로필 선택 영역
+            Obx(
+              () => SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ...controller.profiles.map((profile) {
+                      final isSelected =
+                          controller.selectedChildId.value == profile.id;
+                      return GestureDetector(
+                        onTap: () {
+                          controller.selectedChildId.value = profile.id;
+                          controller.refreshUI();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 8,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.mainPurple
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.darkPurple.withValues(
+                                  alpha: 0.15,
+                                ),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            profile.name,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.darkPurple,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
             // 1. 고정된 요일 헤더 영역
             Row(
               children: [
@@ -80,7 +141,9 @@ class HomeView extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Obx(() {
                   // 확인용 로그 (디버그 콘솔에 찍힙니다)
-                  print("🔥 실시간 렌더링 중: 일정 개수 ${controller.schedules.length}");
+                  print(
+                    "🔥 실시간 렌더링 중: 일정 개수 ${controller.currentSchedules.length}",
+                  );
                   // 동적으로 계산된 시작/종료 시간 사용
                   int start = controller.startHour.value;
                   int end = controller.endHour.value;
@@ -167,7 +230,7 @@ class HomeView extends StatelessWidget {
                                         children: [
                                           _buildGridLines(totalHours),
                                           // 해당 요일 일정만 표시 (좌표는 start 시간에 맞춰 - 처리)
-                                          ...controller.schedules
+                                          ...controller.currentSchedules
                                               .where(
                                                 (s) => s.dayOfWeek == dayNum,
                                               )
@@ -732,6 +795,167 @@ class HomeView extends StatelessWidget {
     }
   }
 
+  void _showProfileEditSheet(BuildContext context, HomeController controller) {
+    Get.bottomSheet(
+      Obx(
+        () => Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '아이 프로필 관리',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.darkPurple,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // 프로필 목록
+              ...controller.profiles.map((profile) {
+                final nameController = TextEditingController(
+                  text: profile.name,
+                );
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.child_care, color: AppColors.mainPurple),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: nameController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          onSubmitted: (val) =>
+                              controller.updateProfile(profile.id, val),
+                          onEditingComplete: () {
+                            controller.updateProfile(
+                              profile.id,
+                              nameController.text,
+                            );
+                            FocusScope.of(Get.context!).unfocus();
+                          },
+                        ),
+                      ),
+                      // ✅ 확인 버튼 추가
+                      IconButton(
+                        icon: const Icon(
+                          Icons.check_circle,
+                          color: AppColors.mainPurple,
+                        ),
+                        onPressed: () {
+                          controller.updateProfile(
+                            profile.id,
+                            nameController.text.trim(),
+                          );
+                          FocusScope.of(Get.context!).unfocus();
+                        },
+                      ),
+                      // 삭제 버튼
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: controller.profiles.length > 1
+                              ? Colors.redAccent
+                              : Colors.grey,
+                        ),
+                        onPressed: controller.profiles.length > 1
+                            ? () => _confirmDeleteProfile(
+                                controller,
+                                profile.id,
+                                profile.name,
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 10),
+              // 아이 추가 버튼
+              ElevatedButton.icon(
+                onPressed: () => _showAddProfileDialog(controller),
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Text(
+                  '아이 추가',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainPurple,
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _showAddProfileDialog(HomeController controller) {
+    final nameController = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        title: const Text('아이 추가'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(hintText: '이름을 입력하세요'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('취소')),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                controller.addProfile(nameController.text.trim());
+                Get.back();
+              }
+            },
+            child: const Text(
+              '추가',
+              style: TextStyle(color: AppColors.mainPurple),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteProfile(
+    HomeController controller,
+    String id,
+    String name,
+  ) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('프로필 삭제'),
+        content: Text('[$name]의 프로필과 모든 일정을 삭제할까요?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('취소')),
+          TextButton(
+            onPressed: () {
+              controller.deleteProfile(id);
+              Get.back();
+            },
+            child: const Text('삭제', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showEditOrDeleteDialog(
     BuildContext context,
     HomeController controller,
@@ -995,7 +1219,7 @@ class HomeView extends StatelessWidget {
                   schedule.dayOfWeek = selectedDay.value;
                   schedule.iconName = selectedIcon.value;
                   schedule.colorValue = selectedColor.value.value;
-                  schedule.save().then((_) => controller.schedules.refresh());
+                  schedule.save().then((_) => controller.refreshUI());
                   Get.back();
                 },
                 style: ElevatedButton.styleFrom(

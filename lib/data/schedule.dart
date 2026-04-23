@@ -25,6 +25,9 @@ class Schedule extends HiveObject {
   @HiveField(6) // 새로운 번호 6번 부여
   int colorValue; // 색상을 숫자(int) 형태로 저장합니다.
 
+  @HiveField(7) // ✅ 새로 추가
+  String childId; // 어떤 아이의 일정인지 구분
+
   Schedule({
     required this.title,
     required this.startTime,
@@ -33,5 +36,6 @@ class Schedule extends HiveObject {
     this.memo = '', // 👈 필수 항목으로 추가
     this.iconName,
     this.colorValue = 0xFFC09FF8, // 기본값은 기존 보라색으로 설정
+    this.childId = 'default', // 기본값은 'default'로 설정
   });
 }

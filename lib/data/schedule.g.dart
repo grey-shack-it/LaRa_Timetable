@@ -24,16 +24,15 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       memo: fields[5] as String,
       iconName: fields[4] as String?,
       // ignore: dead_code
-      colorValue:
-          fields[6] as int ??
-          0xFFC09FF8, // colorValue는 필수로 읽어오도록 하고, 없으면 기본값 사용
+      colorValue: fields[6] as int ?? 0xFFC09FF8, // 기본값 설정
+      childId: fields[7] as String ?? 'default', // 기본값 설정
     );
   }
 
   @override
   void write(BinaryWriter writer, Schedule obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -47,7 +46,9 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       ..writeByte(5)
       ..write(obj.memo)
       ..writeByte(6)
-      ..write(obj.colorValue);
+      ..write(obj.colorValue)
+      ..writeByte(7)
+      ..write(obj.childId);
   }
 
   @override
