@@ -462,49 +462,76 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
-              Container(
-                height: 150, // 👈 딱 이만큼만 높이를 쓰라고 강제로 못 박습니다.
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[50], // 영역 구분을 위해 아주 연한 회색 배경
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: SingleChildScrollView(
-                  // 👈 복잡한 격자 계산 대신 단순 스크롤 사용
-                  padding: const EdgeInsets.all(10),
-                  child: Obx(
-                    () => Wrap(
-                      spacing: 20,
-                      runSpacing: 1,
-                      alignment: WrapAlignment.start,
-                      children: iconKeys.map((name) {
-                        // 👈 위에서 선언한 iconKeys 사용
-                        final isSelected = selectedIcon.value == name;
-                        return GestureDetector(
-                          onTap: () => selectedIcon.value = name,
-                          child: Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.mainPurple
-                                  : Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 4,
-                                      ),
-                                    ]
-                                  : [],
-                            ),
-                            child: _buildAcademyIcon(name, size: 65),
-                          ),
-                        );
-                      }).toList(),
+              //아이콘 선택 영역
+              Builder(
+                builder: (context) {
+                  final scrollController = ScrollController();
+                  return Container(
+                    height: 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                  ),
-                ),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        scrollbarTheme: ScrollbarThemeData(
+                          thumbVisibility: WidgetStateProperty.all(true),
+                          thickness: WidgetStateProperty.all(
+                            6,
+                          ), // 두께 (기본값 약 3~4)
+                          radius: const Radius.circular(10), // 모서리 둥글기
+                          thumbColor: WidgetStateProperty.all(
+                            AppColors.mainPurple,
+                          ), // 색상도 보라로 맞춤
+                        ),
+                      ),
+                      child: Scrollbar(
+                        controller: scrollController,
+                        thumbVisibility: true, // 항상 스크롤바 표시
+                        child: Obx(
+                          () => GridView.count(
+                            controller: scrollController,
+                            crossAxisCount: 4, // 한 행에 4개 고정
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              top: 10,
+                              bottom: 10,
+                              right: 16,
+                            ),
+                            mainAxisSpacing: 4,
+                            crossAxisSpacing: 4,
+                            children: iconKeys.map((name) {
+                              final isSelected = selectedIcon.value == name;
+                              return GestureDetector(
+                                onTap: () => selectedIcon.value = name,
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.mainPurple
+                                        : Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 4,
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  child: _buildAcademyIcon(name, size: 55),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 20),
@@ -770,50 +797,78 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
-              Container(
-                height: 150, // 👈 딱 이만큼만 높이를 쓰라고 강제로 못 박습니다.
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[50], // 영역 구분을 위해 아주 연한 회색 배경
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: SingleChildScrollView(
-                  // 👈 복잡한 격자 계산 대신 단순 스크롤 사용
-                  padding: const EdgeInsets.all(10),
-                  child: Obx(
-                    () => Wrap(
-                      spacing: 20,
-                      runSpacing: 1,
-                      alignment: WrapAlignment.start,
-                      children: iconKeys.map((name) {
-                        // 👈 위에서 선언한 iconKeys 사용
-                        final isSelected = selectedIcon.value == name;
-                        return GestureDetector(
-                          onTap: () => selectedIcon.value = name,
-                          child: Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.mainPurple
-                                  : Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 4,
-                                      ),
-                                    ]
-                                  : [],
-                            ),
-                            child: _buildAcademyIcon(name, size: 65),
-                          ),
-                        );
-                      }).toList(),
+              // 아이콘 선택 영역
+              Builder(
+                builder: (context) {
+                  final scrollController = ScrollController();
+                  return Container(
+                    height: 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                  ),
-                ),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        scrollbarTheme: ScrollbarThemeData(
+                          thumbVisibility: WidgetStateProperty.all(true),
+                          thickness: WidgetStateProperty.all(
+                            6,
+                          ), // 두께 (기본값 약 3~4)
+                          radius: const Radius.circular(10), // 모서리 둥글기
+                          thumbColor: WidgetStateProperty.all(
+                            AppColors.mainPurple,
+                          ), // 색상도 보라로 맞춤
+                        ),
+                      ),
+                      child: Scrollbar(
+                        controller: scrollController,
+                        thumbVisibility: true, // 항상 스크롤바 표시
+                        child: Obx(
+                          () => GridView.count(
+                            controller: scrollController,
+                            crossAxisCount: 4, // 한 행에 4개 고정
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              top: 10,
+                              bottom: 10,
+                              right: 16,
+                            ),
+                            mainAxisSpacing: 4,
+                            crossAxisSpacing: 4,
+                            children: iconKeys.map((name) {
+                              final isSelected = selectedIcon.value == name;
+                              return GestureDetector(
+                                onTap: () => selectedIcon.value = name,
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.mainPurple
+                                        : Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 4,
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  child: _buildAcademyIcon(name, size: 55),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
+
               const SizedBox(height: 20),
               Obx(
                 () => Row(
