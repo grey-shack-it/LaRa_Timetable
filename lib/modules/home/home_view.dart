@@ -505,7 +505,23 @@ class HomeView extends StatelessWidget {
                             children: iconKeys.map((name) {
                               final isSelected = selectedIcon.value == name;
                               return GestureDetector(
-                                onTap: () => selectedIcon.value = name,
+                                onTap: () {
+                                  selectedIcon.value = name;
+                                  final index = iconKeys.indexOf(name);
+                                  final row = (index ~/ 4);
+                                  final itemHeight = 75.0; // 셀 높이
+                                  final targetScroll =
+                                      (row * itemHeight) -
+                                      37.5; // 선택 행이 중앙에 오도록
+                                  scrollController.animateTo(
+                                    targetScroll.clamp(
+                                      0.0,
+                                      scrollController.position.maxScrollExtent,
+                                    ),
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                                },
                                 child: Container(
                                   padding: const EdgeInsets.all(3),
                                   decoration: BoxDecoration(
@@ -801,6 +817,26 @@ class HomeView extends StatelessWidget {
               Builder(
                 builder: (context) {
                   final scrollController = ScrollController();
+                  // 선택된 아이콘의 행 번호 계산 후 자동 스크롤
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!scrollController.hasClients) return; // 안전 체크
+                    final iconKeys = HomeView.academyImages.keys.toList();
+                    final selectedIndex = iconKeys.indexOf(selectedIcon.value);
+                    if (selectedIndex >= 0) {
+                      final row = (selectedIndex ~/ 4);
+                      final itemHeight =
+                          75.0; // GridView 셀 높이 (crossAxisCount:4 기준)
+                      final scrollTo = (row * itemHeight).clamp(
+                        0.0,
+                        scrollController.position.maxScrollExtent,
+                      );
+                      scrollController.animateTo(
+                        scrollTo,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    }
+                  });
                   return Container(
                     height: 150,
                     width: double.infinity,
@@ -840,7 +876,23 @@ class HomeView extends StatelessWidget {
                             children: iconKeys.map((name) {
                               final isSelected = selectedIcon.value == name;
                               return GestureDetector(
-                                onTap: () => selectedIcon.value = name,
+                                onTap: () {
+                                  selectedIcon.value = name;
+                                  final index = iconKeys.indexOf(name);
+                                  final row = (index ~/ 4);
+                                  final itemHeight = 75.0; // 셀 높이
+                                  final targetScroll =
+                                      (row * itemHeight) -
+                                      37.5; // 선택 행이 중앙에 오도록
+                                  scrollController.animateTo(
+                                    targetScroll.clamp(
+                                      0.0,
+                                      scrollController.position.maxScrollExtent,
+                                    ),
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                                },
                                 child: Container(
                                   padding: const EdgeInsets.all(3),
                                   decoration: BoxDecoration(
