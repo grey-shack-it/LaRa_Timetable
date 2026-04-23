@@ -586,9 +586,65 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  // 1. 제목 가져오기
                   String title = titleController.text.trim();
-                  if (title.isEmpty) title = ""; // 제목 비었을 때 처리
+                  // 겹치는 요일이 있는지 확인
+                  List<int> overlappingDays = selectedDays.where((day) {
+                    return controller.hasOverlap(
+                      day,
+                      startTime.value,
+                      endTime.value,
+                    );
+                  }).toList();
+                  if (overlappingDays.isNotEmpty) {
+                    // 겹치는 요일 이름 만들기 (예: "월, 수")
+                    final dayNames = overlappingDays
+                        .map((d) => days[d - 1])
+                        .join(', ');
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text('일정 겹침 안내'),
+                        content: Text(
+                          '[$dayNames] 요일에 이미 같은 시간대의 일정이 있어요.\n그래도 등록할까요?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(), // 다이얼로그만 닫기 (바텀시트는 유지)
+                            child: const Text('다시 입력'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Get.back(); // 다이얼로그 닫기
+                              _doAddSchedule(
+                                controller,
+                                title,
+                                startTime.value,
+                                endTime.value,
+                                selectedDays.toList(),
+                                selectedIcon.value,
+                                selectedColor.value,
+                              );
+                              Get.back(); // 바텀시트 닫기
+                            },
+                            child: const Text(
+                              '그래도 등록',
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
+                  _doAddSchedule(
+                    controller,
+                    title,
+                    startTime.value,
+                    endTime.value,
+                    selectedDays.toList(),
+                    selectedIcon.value,
+                    selectedColor.value,
+                  );
+                  Get.back();
 
                   // 2. 선택된 모든 요일에 대해 일정 추가
                   for (var day in selectedDays) {
@@ -626,6 +682,28 @@ class HomeView extends StatelessWidget {
       ),
       isScrollControlled: true,
     );
+  }
+
+  void _doAddSchedule(
+    HomeController controller,
+    String title,
+    DateTime startTime,
+    DateTime endTime,
+    List<int> selectedDays,
+    String selectedIcon,
+    Color selectedColor,
+  ) {
+    for (var day in selectedDays) {
+      controller.addSchedule(
+        title,
+        startTime,
+        endTime,
+        day,
+        '',
+        selectedIcon,
+        selectedColor.value,
+      );
+    }
   }
 
   void _showEditOrDeleteDialog(

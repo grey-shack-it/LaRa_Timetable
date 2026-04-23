@@ -46,6 +46,20 @@ class HomeController extends GetxController {
     refreshUI(); // 로드 후 화면 갱신
   }
 
+  bool hasOverlap(
+    int day,
+    DateTime start,
+    DateTime end, {
+    Schedule? excludeSelf,
+  }) {
+    return schedules.any((s) {
+      if (s == excludeSelf) return false; // 수정 시 자기 자신은 제외
+      if (s.dayOfWeek != day) return false;
+      // 시간이 겹치는지 확인
+      return start.isBefore(s.endTime) && end.isAfter(s.startTime);
+    });
+  }
+
   void addSchedule(
     String title,
     DateTime start,
