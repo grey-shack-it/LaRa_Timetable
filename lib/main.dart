@@ -22,7 +22,7 @@ void main() async {
   Hive.registerAdapter(ScheduleAdapter());
   await Hive.openBox<Schedule>('schedules');
   await AlarmService.init(); // ✅ 추가
-  MobileAds.instance.initialize(); // ✅ 추가
+  await MobileAds.instance.initialize(); // ✅ 추가
 
   runApp(
     GetMaterialApp(
