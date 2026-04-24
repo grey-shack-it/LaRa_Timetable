@@ -37,6 +37,8 @@ dependencies:
   get: ^4.7.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  flutter_local_notifications: ^18.0.0  # ✅ 추가
+  timezone: ^0.9.4                       # ✅ 추가
 
 dev_dependencies:
   flutter_test:

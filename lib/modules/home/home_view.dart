@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'home_controller.dart';
 import '../../data/schedule.dart';
+import '../../services/alarm_service.dart';
 
 class AppColors {
   static const Color mainPurple = Color(0xFFC09FF8);
@@ -560,6 +561,83 @@ class HomeView extends StatelessWidget {
         : Icon(Icons.school, size: size, color: Colors.white);
   }
 
+  void _showAlarmMinutePicker(RxInt targetMinutes) {
+    final List<int> minuteOptions = [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+    ];
+    final initialIndex = minuteOptions
+        .indexOf(targetMinutes.value)
+        .clamp(0, minuteOptions.length - 1);
+    final fixedController = FixedExtentScrollController(
+      initialItem: initialIndex,
+    );
+
+    Get.bottomSheet(
+      Container(
+        height: 250,
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          children: [
+            const Text(
+              '알림 시간 설정',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkPurple,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: CupertinoPicker(
+                scrollController: fixedController,
+                itemExtent: 44,
+                onSelectedItemChanged: (index) {
+                  targetMinutes.value = minuteOptions[index];
+                },
+                children: minuteOptions
+                    .map(
+                      (m) => Center(
+                        child: Text(
+                          '$m분 전',
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainPurple,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text('확인', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showPicker(DateTime initialTime, Function(DateTime) onChanged) {
     showCupertinoModalPopup(
       context: Get.context!,
@@ -611,6 +689,10 @@ class HomeView extends StatelessWidget {
     var selectedDays = <int>[DateTime.now().weekday].obs;
     var selectedIcon = '국어'.obs;
     var selectedColor = HomeView.pastelColors[0].obs;
+    final startAlarm = false.obs;
+    final startAlarmMinutes = 10.obs;
+    final endAlarm = false.obs;
+    final endAlarmMinutes = 10.obs;
     final List<String> iconKeys = HomeView.academyImages.keys.toList();
     Get.bottomSheet(
       Container(
@@ -781,27 +863,93 @@ class HomeView extends StatelessWidget {
                   }),
                 ),
               ),
-              ListTile(
-                title: const Text('시작 시간'),
-                trailing: Obx(
-                  () => Text(
-                    '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(fontSize: 16),
-                  ),
+              Obx(
+                () => Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _showPicker(
+                        startTime.value,
+                        (d) => startTime.value = d,
+                      ),
+                      child: Row(
+                        children: [
+                          const Text('시작 시간  ', style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 40),
+                          Text(
+                            '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.darkPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _showAlarmMinutePicker(startAlarmMinutes),
+                      child: Text(
+                        '${startAlarmMinutes.value}분전 알림',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.darkPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Checkbox(
+                      value: startAlarm.value,
+                      activeColor: AppColors.mainPurple,
+                      onChanged: (val) => startAlarm.value = val ?? false,
+                    ),
+                  ],
                 ),
-                onTap: () =>
-                    _showPicker(startTime.value, (d) => startTime.value = d),
               ),
-              ListTile(
-                title: const Text('종료 시간'),
-                trailing: Obx(
-                  () => Text(
-                    '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(fontSize: 16),
-                  ),
+
+              // ✅ 종료 시간 + 알람 행
+              Obx(
+                () => Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () =>
+                          _showPicker(endTime.value, (d) => endTime.value = d),
+                      child: Row(
+                        children: [
+                          const Text('종료 시간  ', style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 40),
+                          Text(
+                            '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.darkPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _showAlarmMinutePicker(endAlarmMinutes),
+                      child: Text(
+                        '${endAlarmMinutes.value}분전 알림',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.darkPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Checkbox(
+                      value: endAlarm.value,
+                      activeColor: AppColors.mainPurple,
+                      onChanged: (val) => endAlarm.value = val ?? false,
+                    ),
+                  ],
                 ),
-                onTap: () =>
-                    _showPicker(endTime.value, (d) => endTime.value = d),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
@@ -842,6 +990,10 @@ class HomeView extends StatelessWidget {
                                 selectedDays.toList(),
                                 selectedIcon.value,
                                 selectedColor.value,
+                                startAlarm: startAlarm.value,
+                                startAlarmMinutes: startAlarmMinutes.value,
+                                endAlarm: endAlarm.value,
+                                endAlarmMinutes: endAlarmMinutes.value,
                               );
                               Get.back(); // 바텀시트 닫기
                             },
@@ -863,6 +1015,10 @@ class HomeView extends StatelessWidget {
                     selectedDays.toList(),
                     selectedIcon.value,
                     selectedColor.value,
+                    startAlarm: startAlarm.value,
+                    startAlarmMinutes: startAlarmMinutes.value,
+                    endAlarm: endAlarm.value,
+                    endAlarmMinutes: endAlarmMinutes.value,
                   );
                   Get.back();
                 },
@@ -897,8 +1053,12 @@ class HomeView extends StatelessWidget {
     DateTime endTime,
     List<int> selectedDays,
     String selectedIcon,
-    Color selectedColor,
-  ) {
+    Color selectedColor, {
+    bool startAlarm = false,
+    int startAlarmMinutes = 10,
+    bool endAlarm = false,
+    int endAlarmMinutes = 10,
+  }) {
     for (var day in selectedDays) {
       controller.addSchedule(
         title,
@@ -908,6 +1068,10 @@ class HomeView extends StatelessWidget {
         '',
         selectedIcon,
         selectedColor.value,
+        startAlarm: startAlarm,
+        startAlarmMinutes: startAlarmMinutes,
+        endAlarm: endAlarm,
+        endAlarmMinutes: endAlarmMinutes,
       );
     }
   }
@@ -1123,6 +1287,10 @@ class HomeView extends StatelessWidget {
     var selectedDay = schedule.dayOfWeek.obs;
     var selectedIcon = (schedule.iconName ?? '국어').obs;
     var selectedColor = (Color(schedule.colorValue)).obs;
+    final startAlarm = schedule.startAlarm.obs;
+    final startAlarmMinutes = schedule.startAlarmMinutes.obs;
+    final endAlarm = schedule.endAlarm.obs;
+    final endAlarmMinutes = schedule.endAlarmMinutes.obs;
     final List<String> iconKeys = HomeView.academyImages.keys.toList();
     Get.bottomSheet(
       Container(
@@ -1305,27 +1473,93 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
               ),
-              ListTile(
-                title: const Text('시작 시간'),
-                trailing: Obx(
-                  () => Text(
-                    '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(fontSize: 16),
-                  ),
+              Obx(
+                () => Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _showPicker(
+                        startTime.value,
+                        (d) => startTime.value = d,
+                      ),
+                      child: Row(
+                        children: [
+                          const Text('시작 시간  ', style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 40),
+                          Text(
+                            '${startTime.value.hour}:${startTime.value.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.darkPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _showAlarmMinutePicker(startAlarmMinutes),
+                      child: Text(
+                        '${startAlarmMinutes.value}분전 알림',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.darkPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Checkbox(
+                      value: startAlarm.value,
+                      activeColor: AppColors.mainPurple,
+                      onChanged: (val) => startAlarm.value = val ?? false,
+                    ),
+                  ],
                 ),
-                onTap: () =>
-                    _showPicker(startTime.value, (d) => startTime.value = d),
               ),
-              ListTile(
-                title: const Text('종료 시간'),
-                trailing: Obx(
-                  () => Text(
-                    '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(fontSize: 16),
-                  ),
+
+              // ✅ 종료 시간 + 알람 행
+              Obx(
+                () => Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () =>
+                          _showPicker(endTime.value, (d) => endTime.value = d),
+                      child: Row(
+                        children: [
+                          const Text('종료 시간  ', style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 40),
+                          Text(
+                            '${endTime.value.hour}:${endTime.value.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.darkPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _showAlarmMinutePicker(endAlarmMinutes),
+                      child: Text(
+                        '${endAlarmMinutes.value}분전 알림',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.darkPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Checkbox(
+                      value: endAlarm.value,
+                      activeColor: AppColors.mainPurple,
+                      onChanged: (val) => endAlarm.value = val ?? false,
+                    ),
+                  ],
                 ),
-                onTap: () =>
-                    _showPicker(endTime.value, (d) => endTime.value = d),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
@@ -1336,7 +1570,14 @@ class HomeView extends StatelessWidget {
                   schedule.dayOfWeek = selectedDay.value;
                   schedule.iconName = selectedIcon.value;
                   schedule.colorValue = selectedColor.value.value;
-                  schedule.save().then((_) => controller.refreshUI());
+                  schedule.startAlarm = startAlarm.value; // ✅ 추가
+                  schedule.startAlarmMinutes = startAlarmMinutes.value; // ✅ 추가
+                  schedule.endAlarm = endAlarm.value; // ✅ 추가
+                  schedule.endAlarmMinutes = endAlarmMinutes.value; // ✅ 추가
+                  schedule.save().then((_) {
+                    AlarmService.registerScheduleAlarms(schedule); // ✅ 추가
+                    controller.refreshUI();
+                  });
                   Get.back();
                 },
                 style: ElevatedButton.styleFrom(

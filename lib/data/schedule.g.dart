@@ -26,13 +26,17 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       // ignore: dead_code
       colorValue: fields[6] as int ?? 0xFFC09FF8, // 기본값 설정
       childId: fields[7] as String ?? 'default', // 기본값 설정
+      startAlarm: fields[8] as bool? ?? false,
+      startAlarmMinutes: fields[9] as int? ?? 10,
+      endAlarm: fields[10] as bool? ?? false,
+      endAlarmMinutes: fields[11] as int? ?? 10,
     );
   }
 
   @override
   void write(BinaryWriter writer, Schedule obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -48,7 +52,15 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       ..writeByte(6)
       ..write(obj.colorValue)
       ..writeByte(7)
-      ..write(obj.childId);
+      ..write(obj.childId)
+      ..writeByte(8)
+      ..write(obj.startAlarm)
+      ..writeByte(9)
+      ..write(obj.startAlarmMinutes)
+      ..writeByte(10)
+      ..write(obj.endAlarm)
+      ..writeByte(11)
+      ..write(obj.endAlarmMinutes);
   }
 
   @override

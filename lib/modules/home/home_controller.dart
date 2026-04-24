@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/schedule.dart';
 import 'package:flutter/material.dart';
+import '../../services/alarm_service.dart'; // ✅ 추가
 
 class ChildProfile {
   String id;
@@ -26,11 +27,11 @@ class HomeController extends GetxController {
   final RxBool isOverlapView = false.obs;
 
   static const List<Color> profileColors = [
-    Color(0xFF42A5F5),
-    Color(0xFFEF5350),
-    Color(0xFF66BB6A),
-    Color(0xFFFF7043),
-    Color(0xFFAB47BC),
+    Color.fromARGB(255, 28, 207, 109),
+    Color.fromARGB(255, 247, 147, 17),
+    Color.fromARGB(255, 5, 172, 238),
+    Color.fromARGB(255, 67, 117, 255),
+    Color.fromARGB(255, 218, 233, 15),
   ];
 
   Color getProfileColor(String childId) {
@@ -126,15 +127,19 @@ class HomeController extends GetxController {
     refreshUI();
   }
 
-  void addSchedule(
+  Future<void> addSchedule(
     String title,
     DateTime start,
     DateTime end,
     int day,
     String memo,
     String iconName,
-    int colorValue,
-  ) {
+    int colorValue, {
+    bool startAlarm = false,
+    int startAlarmMinutes = 10,
+    bool endAlarm = false,
+    int endAlarmMinutes = 10,
+  }) async {
     var box = Hive.box<Schedule>('schedules');
     final newSchedule = Schedule(
       title: title,
@@ -144,10 +149,15 @@ class HomeController extends GetxController {
       memo: memo,
       iconName: iconName,
       colorValue: colorValue,
-      childId: selectedChildId.value, // ✅ 현재 선택된 아이 ID로 저장
+      childId: selectedChildId.value,
+      startAlarm: startAlarm,
+      startAlarmMinutes: startAlarmMinutes,
+      endAlarm: endAlarm,
+      endAlarmMinutes: endAlarmMinutes,
     );
 
-    box.add(newSchedule);
+    box.add(newSchedule); // Hive에 저장되면서 key가 생성됨
+    await AlarmService.registerScheduleAlarms(newSchedule); // ✅ key 생성 후 알람 등록
     schedules.assignAll(box.values.toList());
     schedules.value = List.from(schedules);
     refreshUI();
@@ -155,6 +165,7 @@ class HomeController extends GetxController {
   }
 
   void deleteSchedule(Schedule schedule) {
+    AlarmService.cancelScheduleAlarms(schedule); // ✅ 추가
     schedule.delete();
     schedules.remove(schedule);
     schedules.refresh();

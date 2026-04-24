@@ -28,6 +28,18 @@ class Schedule extends HiveObject {
   @HiveField(7) // ✅ 새로 추가
   String childId; // 어떤 아이의 일정인지 구분
 
+  @HiveField(8)
+  bool startAlarm; // 시작 시간 알람 on/off
+
+  @HiveField(9)
+  int startAlarmMinutes; // 시작 몇 분 전 알람
+
+  @HiveField(10)
+  bool endAlarm; // 종료 시간 알람 on/off
+
+  @HiveField(11)
+  int endAlarmMinutes; // 종료 몇 분 전 알람
+
   Schedule({
     required this.title,
     required this.startTime,
@@ -37,5 +49,9 @@ class Schedule extends HiveObject {
     this.iconName,
     this.colorValue = 0xFFC09FF8, // 기본값은 기존 보라색으로 설정
     this.childId = 'default', // 기본값은 'default'로 설정
+    this.startAlarm = false,
+    this.startAlarmMinutes = 10,
+    this.endAlarm = false,
+    this.endAlarmMinutes = 10,
   });
 }
