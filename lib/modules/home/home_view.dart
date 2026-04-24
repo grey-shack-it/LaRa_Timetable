@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'home_controller.dart';
 import '../../data/schedule.dart';
 import '../../services/alarm_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ 추가
 
 class AppColors {
   static const Color mainPurple = Color(0xFFC09FF8);
@@ -12,9 +13,18 @@ class AppColors {
   static const Color gridLine = Color(0xFFBCA9E1);
 }
 
-class HomeView extends StatelessWidget {
-  // 다시 StatelessWidget으로!
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
+
+  static const String _adUnitId = 'ca-app-pub-3940256099942544/6300978111';
 
   static const Map<String, String> academyImages = {
     '국어': 'ic_korean.png',
@@ -36,6 +46,37 @@ class HomeView extends StatelessWidget {
     Color(0xFFA5D6A7), // 초록
     Color(0xFF90CAF9), // 파랑
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          print('배너 광고 로드 실패: $error');
+        },
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,267 +107,291 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ✅ 프로필 선택 영역
-            Obx(
-              () => SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ...controller.profiles.map((profile) {
-                      final isSelected =
-                          controller.selectedChildId.value == profile.id;
+      body: Column(
+        children: [
+          Expanded(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // ✅ 프로필 선택 영역
+                  Obx(
+                    () => SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          ...controller.profiles.map((profile) {
+                            final isSelected =
+                                controller.selectedChildId.value == profile.id;
 
-                      return GestureDetector(
-                        onTap: () {
-                          controller.isOverlapView.value =
-                              false; // 한눈에 모드 자동 해제
-                          controller.selectedChildId.value = profile.id;
-                          controller.refreshUI();
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 8,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.mainPurple
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.darkPurple.withValues(
-                                  alpha: 0.15,
+                            return GestureDetector(
+                              onTap: () {
+                                controller.isOverlapView.value =
+                                    false; // 한눈에 모드 자동 해제
+                                controller.selectedChildId.value = profile.id;
+                                controller.refreshUI();
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
                                 ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? AppColors.mainPurple
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.darkPurple.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  profile.name,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.darkPurple,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                          child: Text(
-                            profile.name,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.darkPurple,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
+                            );
+                          }).toList(),
+
+                          // ✅ 겹쳐보기 버튼
+                          Obx(
+                            () => GestureDetector(
+                              onTap: () {
+                                controller.isOverlapView.value =
+                                    !controller.isOverlapView.value;
+                                controller.refreshUI();
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: controller.isOverlapView.value
+                                      ? AppColors.darkPurple
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.darkPurple.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.people_alt,
+                                      size: 16,
+                                      color: controller.isOverlapView.value
+                                          ? Colors.white
+                                          : AppColors.darkPurple,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '한눈에',
+                                      style: TextStyle(
+                                        color: controller.isOverlapView.value
+                                            ? Colors.white
+                                            : AppColors.darkPurple,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-
-                    // ✅ 겹쳐보기 버튼
-                    Obx(
-                      () => GestureDetector(
-                        onTap: () {
-                          controller.isOverlapView.value =
-                              !controller.isOverlapView.value;
-                          controller.refreshUI();
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 8,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: controller.isOverlapView.value
-                                ? AppColors.darkPurple
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.darkPurple.withValues(
-                                  alpha: 0.15,
-                                ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.people_alt,
-                                size: 16,
-                                color: controller.isOverlapView.value
-                                    ? Colors.white
-                                    : AppColors.darkPurple,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '한눈에',
-                                style: TextStyle(
-                                  color: controller.isOverlapView.value
-                                      ? Colors.white
-                                      : AppColors.darkPurple,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            // 1. 고정된 요일 헤더 영역
-            Row(
-              children: [
-                const SizedBox(width: 45), // 시간축 너비만큼 띄우기
-                ...List.generate(
-                  7,
-                  (index) => Expanded(
-                    child: _buildDayHeader(weekDays[index], index + 1),
                   ),
-                ),
-              ],
-            ),
-
-            // 2. 스크롤되는 시간표 그리드 영역
-            Expanded(
-              child: SingleChildScrollView(
-                child: Obx(() {
-                  // 확인용 로그 (디버그 콘솔에 찍힙니다)
-                  print(
-                    "🔥 실시간 렌더링 중: 일정 개수 ${controller.currentSchedules.length}",
-                  );
-                  // 동적으로 계산된 시작/종료 시간 사용
-                  int start = controller.startHour.value;
-                  int end = controller.endHour.value;
-                  int totalHours = end - start + 1;
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // 1. 고정된 요일 헤더 영역
+                  Row(
                     children: [
-                      // 왼쪽 시간축
-                      Container(
-                        width: 45,
-                        child: Column(
-                          children: List.generate(
-                            totalHours,
-                            (i) => Container(
-                              // 🎯 SizedBox를 Container로 변경
-                              height: 60,
-                              decoration: BoxDecoration(
-                                // 🎯 테두리 선 추가
-                                border: Border(
-                                  bottom: BorderSide(
-                                    // 일정표 안의 선과 색상/두께를 맞추는 게 중요합니다!
-                                    color: AppColors.gridLine.withValues(
-                                      alpha: 0.8,
-                                    ),
-                                    width: 0.8,
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${start + i}시',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.darkPurple,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                      const SizedBox(width: 45), // 시간축 너비만큼 띄우기
+                      ...List.generate(
+                        7,
+                        (index) => Expanded(
+                          child: _buildDayHeader(weekDays[index], index + 1),
                         ),
                       ),
+                    ],
+                  ),
 
-                      // 요일별 그리드
-                      ...List.generate(7, (index) {
-                        int dayNum = index + 1;
-                        return Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: AppColors.gridLine.withValues(
-                                    alpha: 0.8,
+                  // 2. 스크롤되는 시간표 그리드 영역
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Obx(() {
+                        // 확인용 로그 (디버그 콘솔에 찍힙니다)
+                        print(
+                          "🔥 실시간 렌더링 중: 일정 개수 ${controller.currentSchedules.length}",
+                        );
+                        // 동적으로 계산된 시작/종료 시간 사용
+                        int start = controller.startHour.value;
+                        int end = controller.endHour.value;
+                        int totalHours = end - start + 1;
+
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 왼쪽 시간축
+                            Container(
+                              width: 45,
+                              child: Column(
+                                children: List.generate(
+                                  totalHours,
+                                  (i) => Container(
+                                    // 🎯 SizedBox를 Container로 변경
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      // 🎯 테두리 선 추가
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          // 일정표 안의 선과 색상/두께를 맞추는 게 중요합니다!
+                                          color: AppColors.gridLine.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '${start + i}시',
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: AppColors.darkPurple,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  width: 1.5,
                                 ),
                               ),
                             ),
-                            child: Builder(
-                              builder: (dropContext) {
-                                return DragTarget<Schedule>(
-                                  onWillAcceptWithDetails: (details) => true,
-                                  onAcceptWithDetails: (details) {
-                                    final RenderBox box =
-                                        dropContext.findRenderObject()
-                                            as RenderBox;
-                                    final Offset localOffset = box
-                                        .globalToLocal(details.offset);
 
-                                    // 🎯 좌표 보정: 드롭된 위치에 현재 시작 시간(start)을 더해줘야 정확한 시간이 계산됨
-                                    double adjustedY =
-                                        localOffset.dy + (start * 60.0);
-                                    controller.updateScheduleTime(
-                                      details.data,
-                                      dayNum,
-                                      adjustedY,
-                                    );
-                                  },
-                                  builder: (context, candidateData, rejectedData) {
-                                    return SizedBox(
-                                      height: totalHours * 60.0,
-                                      child: Stack(
-                                        children: [
-                                          _buildGridLines(totalHours),
-                                          // 해당 요일 일정만 표시 (좌표는 start 시간에 맞춰 - 처리)
-                                          ...controller.displaySchedules
-                                              .where(
-                                                (s) => s.dayOfWeek == dayNum,
-                                              )
-                                              .map(
-                                                (s) => _buildDraggableBlock(
-                                                  context,
-                                                  controller,
-                                                  s,
-                                                  start,
-                                                ),
-                                              ),
-                                          if (dayNum == DateTime.now().weekday)
-                                            _buildCurrentTimeLine(
-                                              controller,
-                                              start,
-                                            ),
-                                        ],
+                            // 요일별 그리드
+                            ...List.generate(7, (index) {
+                              int dayNum = index + 1;
+                              return Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      left: BorderSide(
+                                        color: AppColors.gridLine.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        width: 1.5,
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
+                                    ),
+                                  ),
+                                  child: Builder(
+                                    builder: (dropContext) {
+                                      return DragTarget<Schedule>(
+                                        onWillAcceptWithDetails: (details) =>
+                                            true,
+                                        onAcceptWithDetails: (details) {
+                                          final RenderBox box =
+                                              dropContext.findRenderObject()
+                                                  as RenderBox;
+                                          final Offset localOffset = box
+                                              .globalToLocal(details.offset);
+
+                                          // 🎯 좌표 보정: 드롭된 위치에 현재 시작 시간(start)을 더해줘야 정확한 시간이 계산됨
+                                          double adjustedY =
+                                              localOffset.dy + (start * 60.0);
+                                          controller.updateScheduleTime(
+                                            details.data,
+                                            dayNum,
+                                            adjustedY,
+                                          );
+                                        },
+                                        builder:
+                                            (
+                                              context,
+                                              candidateData,
+                                              rejectedData,
+                                            ) {
+                                              return SizedBox(
+                                                height: totalHours * 60.0,
+                                                child: Stack(
+                                                  children: [
+                                                    _buildGridLines(totalHours),
+                                                    // 해당 요일 일정만 표시 (좌표는 start 시간에 맞춰 - 처리)
+                                                    ...controller
+                                                        .displaySchedules
+                                                        .where(
+                                                          (s) =>
+                                                              s.dayOfWeek ==
+                                                              dayNum,
+                                                        )
+                                                        .map(
+                                                          (s) =>
+                                                              _buildDraggableBlock(
+                                                                context,
+                                                                controller,
+                                                                s,
+                                                                start,
+                                                              ),
+                                                        ),
+                                                    if (dayNum ==
+                                                        DateTime.now().weekday)
+                                                      _buildCurrentTimeLine(
+                                                        controller,
+                                                        start,
+                                                      ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
                         );
                       }),
-                    ],
-                  );
-                }),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          if (_isAdLoaded && _bannerAd != null)
+            SizedBox(
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
+            ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.mainPurple,
         onPressed: () => _showAddDialog(context, controller),
@@ -688,12 +753,12 @@ class HomeView extends StatelessWidget {
     });
     var selectedDays = <int>[DateTime.now().weekday].obs;
     var selectedIcon = '국어'.obs;
-    var selectedColor = HomeView.pastelColors[0].obs;
+    var selectedColor = pastelColors[0].obs;
     final startAlarm = false.obs;
     final startAlarmMinutes = 10.obs;
     final endAlarm = false.obs;
     final endAlarmMinutes = 10.obs;
-    final List<String> iconKeys = HomeView.academyImages.keys.toList();
+    final List<String> iconKeys = academyImages.keys.toList();
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -1291,7 +1356,7 @@ class HomeView extends StatelessWidget {
     final startAlarmMinutes = schedule.startAlarmMinutes.obs;
     final endAlarm = schedule.endAlarm.obs;
     final endAlarmMinutes = schedule.endAlarmMinutes.obs;
-    final List<String> iconKeys = HomeView.academyImages.keys.toList();
+    final List<String> iconKeys = academyImages.keys.toList();
     Get.bottomSheet(
       Container(
         height: MediaQuery.of(context).size.height * 0.75,
@@ -1329,7 +1394,7 @@ class HomeView extends StatelessWidget {
                   // 선택된 아이콘의 행 번호 계산 후 자동 스크롤
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (!scrollController.hasClients) return; // 안전 체크
-                    final iconKeys = HomeView.academyImages.keys.toList();
+                    final iconKeys = academyImages.keys.toList();
                     final selectedIndex = iconKeys.indexOf(selectedIcon.value);
                     if (selectedIndex >= 0) {
                       final row = (selectedIndex ~/ 4);
@@ -1434,7 +1499,7 @@ class HomeView extends StatelessWidget {
               Obx(
                 () => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: HomeView.pastelColors.map((color) {
+                  children: pastelColors.map((color) {
                     return GestureDetector(
                       onTap: () => selectedColor.value = color,
                       child: Container(
