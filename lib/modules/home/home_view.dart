@@ -77,50 +77,46 @@ class HomeView extends StatelessWidget {
                     ...controller.profiles.map((profile) {
                       final isSelected =
                           controller.selectedChildId.value == profile.id;
-                      // ✅ 겹쳐보기 중엔 탭 비활성화 (흐리게)
-                      final isDisabled = controller.isOverlapView.value;
+
                       return GestureDetector(
-                        onTap: isDisabled
-                            ? null
-                            : () {
-                                controller.selectedChildId.value = profile.id;
-                                controller.refreshUI();
-                              },
-                        child: Opacity(
-                          opacity: isDisabled ? 0.4 : 1.0,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 8,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected && !isDisabled
-                                  ? AppColors.mainPurple
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.darkPurple.withValues(
-                                    alpha: 0.15,
-                                  ),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
+                        onTap: () {
+                          controller.isOverlapView.value =
+                              false; // 한눈에 모드 자동 해제
+                          controller.selectedChildId.value = profile.id;
+                          controller.refreshUI();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 8,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.mainPurple
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.darkPurple.withValues(
+                                  alpha: 0.15,
                                 ),
-                              ],
-                            ),
-                            child: Text(
-                              profile.name,
-                              style: TextStyle(
-                                color: isSelected && !isDisabled
-                                    ? Colors.white
-                                    : AppColors.darkPurple,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 14,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
                               ),
+                            ],
+                          ),
+                          child: Text(
+                            profile.name,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.darkPurple,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
                             ),
                           ),
                         ),
