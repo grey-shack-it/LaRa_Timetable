@@ -115,7 +115,6 @@ flutter_native_splash:
   image_dark: assets/images/larapapa.png
   android: true
   ios: false                # iOS는 지금 안 하시니까 false
-  fullscreen: true
   android_12:
     color: "#F1EBFF"
     image: assets/images/larapapa.png

@@ -24,7 +24,9 @@ class _HomeViewState extends State<HomeView> {
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
 
-  static const String _adUnitId = 'ca-app-pub-8035187743335742/8495628808';
+  static const String _adUnitId =
+      'ca-app-pub-3940256099942544/6300978111'; // 광고 테스트 ID
+  // 실제 배포 ID : ca-app-pub-8035187743335742/8495628808
 
   static const Map<String, String> academyImages = {
     '국어': 'ic_korean.png',
