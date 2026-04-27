@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// [주의] 아래 경로는 실제 파일 위치와 정확히 일치해야 합니다!
 import 'data/schedule.dart';
 import 'modules/home/home_view.dart';
 // ignore: unused_import
@@ -31,7 +30,7 @@ void main() async {
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Timeline App',
+      title: '라라 시간표',
       home: HomeView(),
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.lightPurple, // 전체 배경을 연한 보라로

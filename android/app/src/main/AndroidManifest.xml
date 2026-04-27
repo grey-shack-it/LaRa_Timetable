@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
         
     <application
-        android:label="아이들 일정"
+        android:label="라라 시간표"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

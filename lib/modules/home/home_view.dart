@@ -92,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
         title: const Text(
-          '아이들 일정 관리',
+          '라라 시간표',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             color: AppColors.darkPurple,
