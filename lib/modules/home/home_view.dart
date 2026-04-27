@@ -1145,6 +1145,7 @@ class _HomeViewState extends State<HomeView> {
     Get.bottomSheet(
       Obx(
         () => Container(
+          height: MediaQuery.of(Get.context!).size.height * 0.45, // ✅ 높이 직접 지정
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -1163,68 +1164,77 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 16),
               // 프로필 목록
-              ...controller.profiles.map((profile) {
-                final nameController = TextEditingController(
-                  text: profile.name,
-                );
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.child_care, color: AppColors.mainPurple),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: nameController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            isDense: true,
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 230), // 최대 높이 제한
+                child: ListView(
+                  shrinkWrap: true,
+                  children: controller.profiles.map((profile) {
+                    final nameController = TextEditingController(
+                      text: profile.name,
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.child_care,
+                            color: AppColors.mainPurple,
                           ),
-                          onSubmitted: (val) =>
-                              controller.updateProfile(profile.id, val),
-                          onEditingComplete: () {
-                            controller.updateProfile(
-                              profile.id,
-                              nameController.text,
-                            );
-                            FocusScope.of(Get.context!).unfocus();
-                          },
-                        ),
-                      ),
-                      // ✅ 확인 버튼 추가
-                      IconButton(
-                        icon: const Icon(
-                          Icons.check_circle,
-                          color: AppColors.mainPurple,
-                        ),
-                        onPressed: () {
-                          controller.updateProfile(
-                            profile.id,
-                            nameController.text.trim(),
-                          );
-                          FocusScope.of(Get.context!).unfocus();
-                        },
-                      ),
-                      // 삭제 버튼
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: controller.profiles.length > 1
-                              ? Colors.redAccent
-                              : Colors.grey,
-                        ),
-                        onPressed: controller.profiles.length > 1
-                            ? () => _confirmDeleteProfile(
-                                controller,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: nameController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                              onSubmitted: (val) =>
+                                  controller.updateProfile(profile.id, val),
+                              onEditingComplete: () {
+                                controller.updateProfile(
+                                  profile.id,
+                                  nameController.text,
+                                );
+                                FocusScope.of(Get.context!).unfocus();
+                              },
+                            ),
+                          ),
+                          // ✅ 확인 버튼 추가
+                          IconButton(
+                            icon: const Icon(
+                              Icons.check_circle,
+                              color: AppColors.mainPurple,
+                            ),
+                            onPressed: () {
+                              controller.updateProfile(
                                 profile.id,
-                                profile.name,
-                              )
-                            : null,
+                                nameController.text.trim(),
+                              );
+                              FocusScope.of(Get.context!).unfocus();
+                            },
+                          ),
+                          // 삭제 버튼
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: controller.profiles.length > 1
+                                  ? Colors.redAccent
+                                  : Colors.grey,
+                            ),
+                            onPressed: controller.profiles.length > 1
+                                ? () => _confirmDeleteProfile(
+                                    controller,
+                                    profile.id,
+                                    profile.name,
+                                  )
+                                : null,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }),
+                    );
+                  }).toList(),
+                ),
+              ),
               const SizedBox(height: 10),
               // 아이 추가 버튼
               ElevatedButton.icon(
@@ -1246,7 +1256,7 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
       ),
-      isScrollControlled: true,
+      ignoreSafeArea: false,
     );
   }
 
@@ -1269,10 +1279,7 @@ class _HomeViewState extends State<HomeView> {
                 Get.back();
               }
             },
-            child: const Text(
-              '추가',
-              style: TextStyle(color: AppColors.mainPurple),
-            ),
+            child: const Text('추가'),
           ),
         ],
       ),

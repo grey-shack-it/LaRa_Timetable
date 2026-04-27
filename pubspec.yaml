@@ -54,6 +54,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   hive_generator: ^2.0.1
   build_runner: ^2.4.13
+  flutter_native_splash: ^2.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,6 +68,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
+    - assets/images/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -105,3 +107,15 @@ flutter_launcher_icons:
   image_path: "assets/images/app_icon.png"
   adaptive_icon_background: "#F1EBFF" # 앱의 메인 배경색인 연보라색으로 지정
   adaptive_icon_foreground: "assets/images/app_icon.png"
+
+flutter_native_splash:
+  color: "#F1EBFF"          # 연보라 배경색 (앱 테마에 맞게)
+  image: assets/images/larapapa.png  # 로고 이미지 경로
+  color_dark: "#F1EBFF"
+  image_dark: assets/images/larapapa.png
+  android: true
+  ios: false                # iOS는 지금 안 하시니까 false
+  fullscreen: true
+  android_12:
+    color: "#F1EBFF"
+    image: assets/images/larapapa.png

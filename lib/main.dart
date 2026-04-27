@@ -8,6 +8,7 @@ import 'modules/home/home_view.dart';
 import 'modules/home/home_controller.dart';
 import 'services/alarm_service.dart'; // ✅ 추가
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ 추가
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class AppColors {
   static const Color mainPurple = Color(0xFFC09FF8); // 메인 보라색 (이미지 레퍼런스)
@@ -17,12 +18,15 @@ class AppColors {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Hive.initFlutter();
   Hive.registerAdapter(ScheduleAdapter());
   await Hive.openBox<Schedule>('schedules');
   await AlarmService.init(); // ✅ 추가
   await MobileAds.instance.initialize(); // ✅ 추가
+
+  FlutterNativeSplash.remove();
 
   runApp(
     GetMaterialApp(
