@@ -9,7 +9,7 @@ class AlarmService {
 
   static bool _initialized = false; // ✅ 초기화 여부 체크 변수 추가
   static Future<void> init() async {
-    if (_initialized) return; // 이미 초기화되었으면 건너뜀
+    if (_initialized) return;
 
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
@@ -20,21 +20,27 @@ class AlarmService {
     const initSettings = InitializationSettings(android: androidSettings);
     await _notifications.initialize(initSettings);
 
-    // Android 13+ 알림 권한 요청
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+    try {
+      await _notifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestNotificationsPermission();
+    } catch (e) {
+      print('알림 권한 요청 오류: $e');
+    }
 
-    // 정확한 알람 권한 요청
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestExactAlarmsPermission();
+    try {
+      await _notifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestExactAlarmsPermission();
+    } catch (e) {
+      print('정확한 알람 권한 요청 오류: $e');
+    }
 
-    _initialized = true; // ✅ 초기화 완료 표시
+    _initialized = true;
   }
 
   // 알람 예약
