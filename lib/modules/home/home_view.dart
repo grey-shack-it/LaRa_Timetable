@@ -91,13 +91,18 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
-        title: const Text(
-          '라라 시간표',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            color: AppColors.darkPurple,
-          ),
-        ),
+        title: Obx(() {
+          final title = controller.isOverlapView.value
+              ? '아이들 시간표'
+              : '${controller.getProfileName(controller.selectedChildId.value)}의 시간표';
+          return Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              color: AppColors.darkPurple,
+            ),
+          );
+        }),
         centerTitle: true,
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
