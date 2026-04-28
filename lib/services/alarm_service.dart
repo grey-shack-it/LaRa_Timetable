@@ -2,6 +2,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import '../data/schedule.dart';
+import 'package:get/get.dart'; // ✅ 추가
+import '../modules/home/home_controller.dart'; // ✅ 추가
 
 class AlarmService {
   static final FlutterLocalNotificationsPlugin _notifications =
@@ -93,6 +95,10 @@ class AlarmService {
 
     final now = DateTime.now();
 
+    // ✅ 아이 이름 가져오기
+    final controller = Get.find<HomeController>();
+    final childName = controller.getProfileName(schedule.childId);
+
     if (schedule.startAlarm) {
       // 시작 시간 알람 - 요일별로 다음 해당 요일 날짜 계산
       final startAlarmTime = _nextWeekday(
@@ -105,7 +111,8 @@ class AlarmService {
         await scheduleAlarm(
           id: (schedule.key as int) * 10 + 1, // ✅ as int 추가
           title: '📚 곧 시작해요!',
-          body: '${schedule.title} ${schedule.startAlarmMinutes}분 후에 시작해요',
+          body:
+              '${schedule.startAlarmMinutes}분 후에 $childName의 ${schedule.title} 수업 시작이에요. 가방 챙기셨죠?',
           scheduledTime: startAlarmTime,
         );
       }
@@ -122,7 +129,8 @@ class AlarmService {
         await scheduleAlarm(
           id: (schedule.key as int) * 10 + 2, // ✅ as int 추가
           title: '🏁 곧 끝나요!',
-          body: '${schedule.title} ${schedule.endAlarmMinutes}분 후에 끝나요',
+          body:
+              '${schedule.endAlarmMinutes}분 후에 $childName의 ${schedule.title} 수업이 끝나요. 슬슬 마중을 나가 볼까요?',
           scheduledTime: endAlarmTime,
         );
       }
