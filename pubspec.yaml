@@ -40,6 +40,7 @@ dependencies:
   flutter_local_notifications: ^18.0.0  # ✅ 추가
   timezone: ^0.9.4                       # ✅ 추가
   google_mobile_ads: ^5.1.0  # ✅ 추가
+  device_info_plus: ^10.0.0  # ✅ 추가
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import '../data/schedule.dart';
 import 'package:get/get.dart'; // ✅ 추가
 import '../modules/home/home_controller.dart'; // ✅ 추가
+import 'package:device_info_plus/device_info_plus.dart'; // ✅ 추가
 
 class AlarmService {
   static final FlutterLocalNotificationsPlugin _notifications =
@@ -33,11 +34,14 @@ class AlarmService {
     }
 
     try {
-      await _notifications
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestExactAlarmsPermission();
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt >= 31) {
+        await _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()
+            ?.requestExactAlarmsPermission();
+      }
     } catch (e) {
       print('정확한 알람 권한 요청 오류: $e');
     }
