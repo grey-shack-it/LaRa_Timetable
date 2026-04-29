@@ -70,6 +70,7 @@ class AlarmService {
             channelDescription: '아이들 일정 알림',
             importance: Importance.max,
             priority: Priority.high,
+            icon: '@mipmap/launcher_icon', // ✅ 앱 아이콘으로 변경
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

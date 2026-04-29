@@ -555,12 +555,15 @@ class _HomeViewState extends State<HomeView> {
             // 기존 아이콘 + 제목
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (schedule.iconName != null)
                   Flexible(
-                    child: _buildAcademyIcon(
-                      schedule.iconName!,
-                      size: iconSize,
+                    child: Center(
+                      child: _buildAcademyIcon(
+                        schedule.iconName!,
+                        size: iconSize,
+                      ),
                     ),
                   ),
                 Padding(
@@ -1110,6 +1113,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -1674,6 +1678,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
