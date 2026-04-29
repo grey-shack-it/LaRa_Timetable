@@ -1152,7 +1152,7 @@ class _HomeViewState extends State<HomeView> {
     Get.bottomSheet(
       Obx(
         () => Container(
-          height: MediaQuery.of(Get.context!).size.height * 0.45, // ✅ 높이 직접 지정
+          height: MediaQuery.of(Get.context!).size.height * 0.65, // ✅ 높이 직접 지정
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -1171,8 +1171,7 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 16),
               // 프로필 목록
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 230), // 최대 높이 제한
+              Expanded(
                 child: ListView(
                   shrinkWrap: true,
                   children: controller.profiles.map((profile) {
