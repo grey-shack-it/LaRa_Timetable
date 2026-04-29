@@ -144,9 +144,12 @@ class AlarmService {
 
   // 일정의 알람 전체 취소
   static Future<void> cancelScheduleAlarms(Schedule schedule) async {
-    if (schedule.key == null) return; // ✅ 추가
-    await cancelAlarm((schedule.key as int) * 10 + 1);
-    await cancelAlarm((schedule.key as int) * 10 + 2);
+    if (schedule.key == null) return;
+    final int key = schedule.key is int
+        ? schedule.key as int
+        : int.tryParse(schedule.key.toString()) ?? 0;
+    await cancelAlarm(key * 10 + 1);
+    await cancelAlarm(key * 10 + 2);
   }
 
   // 다음 해당 요일 DateTime 계산 (dayOfWeek: 1=월 ~ 7=일)

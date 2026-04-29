@@ -585,7 +585,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -688,6 +688,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  saver_gallery:
+    dependency: "direct main"
+    description:
+      name: saver_gallery
+      sha256: "35f838453cbf17d4b710d0783ced0d2c9aeb79a607f290684b9c3c798c22beb8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.10"
+  screenshot:
+    dependency: "direct main"
+    description:
+      name: screenshot
+      sha256: "63817697a7835e6ce82add4228e15d233b74d42975c143ad8cfe07009fab866b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   shelf:
     dependency: transitive
     description:
@@ -813,6 +829,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      sha256: "1fef9e8e11e2991bb773070d4656b7bd5d850967a2456cfc83cf47925ba79489"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.3"
   vector_math:
     dependency: transitive
     description:

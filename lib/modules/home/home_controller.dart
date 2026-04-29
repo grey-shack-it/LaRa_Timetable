@@ -165,7 +165,9 @@ class HomeController extends GetxController {
   }
 
   void deleteSchedule(Schedule schedule) {
-    AlarmService.cancelScheduleAlarms(schedule); // ✅ 추가
+    if (schedule.key != null) {
+      AlarmService.cancelScheduleAlarms(schedule);
+    }
     schedule.delete();
     schedules.remove(schedule);
     schedules.refresh();

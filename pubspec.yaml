@@ -41,6 +41,9 @@ dependencies:
   timezone: ^0.9.4                       # ✅ 추가
   google_mobile_ads: ^5.1.0  # ✅ 추가
   device_info_plus: ^10.0.0  # ✅ 추가
+  screenshot: ^3.0.0        # ✅ 추가
+  saver_gallery: ^3.0.6     # ✅ 추가
+  path_provider: ^2.1.0
 
 dev_dependencies:
   flutter_test:
