@@ -8,13 +8,7 @@ import 'modules/home/home_controller.dart';
 import 'services/alarm_service.dart'; // ✅ 추가
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ✅ 추가
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
-class AppColors {
-  static const Color mainPurple = Color(0xFFC09FF8); // 메인 보라색 (이미지 레퍼런스)
-  static const Color lightPurple = Color(0xFFE5D9F9); // 연한 보라 (배경용)
-  static const Color darkPurple = Color(0xFF9F75E3); // 진한 보라 (그림자/강조용)
-  static const Color white = Colors.white;
-}
+import 'package:my_timeline_app/constants/app_colors.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
