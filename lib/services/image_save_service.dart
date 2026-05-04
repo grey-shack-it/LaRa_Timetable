@@ -85,6 +85,7 @@ class ImageSaveService {
     final int ttWidth = ttImage.width;
     final int ttHeight = ttImage.height;
     final int topPadding = (ttWidth * 0.1).toInt();
+    final int bottomPadding = (ttWidth * 0.1).toInt();
     final int topBannerHeight = (ttWidth * 0.10).toInt(); // ✅ 상단 배너 높이
     final int bannerHeight = (ttWidth * 0.2).toInt(); // 하단배너 높이
 
@@ -110,9 +111,16 @@ class ImageSaveService {
         0,
         0,
         ttWidth.toDouble(),
-        (ttHeight + bannerHeight + topBannerHeight + topPadding).toDouble(),
+        (ttHeight + bannerHeight + topBannerHeight + topPadding + bottomPadding)
+            .toDouble(),
       ),
       Paint()..color = const Color(0xFFE5D9F9),
+    );
+
+    // ✅ 상단 패딩 검은색
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, ttWidth.toDouble(), topPadding.toDouble()),
+      Paint()..color = Colors.black,
     );
 
     // ✅ 상단 배너 배경
@@ -238,12 +246,21 @@ class ImageSaveService {
       Rect.fromLTWH(qrX, qrY, qrSize, qrSize),
       Paint(),
     );
-
+    // ✅ 하단 패딩 검은색
+    canvas.drawRect(
+      Rect.fromLTWH(
+        0,
+        (ttHeight + bannerHeight + topBannerHeight + topPadding).toDouble(),
+        ttWidth.toDouble(),
+        bottomPadding.toDouble(),
+      ),
+      Paint()..color = Colors.black,
+    );
     // 최종 이미지 생성
     final picture = recorder.endRecording();
     final ui.Image finalImg = await picture.toImage(
       ttWidth,
-      ttHeight + bannerHeight + topBannerHeight + topPadding,
+      ttHeight + bannerHeight + topBannerHeight + topPadding + bottomPadding,
     );
     final ByteData? byteData = await finalImg.toByteData(
       format: ui.ImageByteFormat.png,

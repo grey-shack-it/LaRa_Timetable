@@ -201,10 +201,11 @@ class AddScheduleDialog {
                 () => Row(
                   children: [
                     GestureDetector(
-                      onTap: () => showScheduleTimePicker(
-                        startTime.value,
-                        (d) => startTime.value = d,
-                      ), // ✅ 헬퍼 사용
+                      onTap: () => showScheduleTimePicker(startTime.value, (d) {
+                        startTime.value = d;
+                        // ✅ 종료 시간도 시작 시간 + 1시간으로 자동 업데이트
+                        endTime.value = d.add(const Duration(hours: 1));
+                      }),
                       child: Row(
                         children: [
                           const Text('시작 시간  ', style: TextStyle(fontSize: 16)),

@@ -134,6 +134,8 @@ class _HomeViewState extends State<HomeView> {
                           Expanded(
                             child: SingleChildScrollView(
                               child: Obx(() {
+                                final _ = controller.selectedChildId.value;
+                                final __ = controller.schedules.length;
                                 int start = controller.startHour.value;
                                 int end = controller.endHour.value;
                                 int totalHours = end - start + 1;

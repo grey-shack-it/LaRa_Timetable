@@ -28,10 +28,9 @@ class ProfileManageSheet {
               const SizedBox(height: 16),
 
               // 프로필 목록
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 200),
+              Expanded(
                 child: ListView(
-                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(bottom: 8), // ✅ 목록 하단 여백
                   children: controller.profiles.map((profile) {
                     final nameController = TextEditingController(
                       text: profile.name,
@@ -98,7 +97,7 @@ class ProfileManageSheet {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
 
               // 아이 추가 버튼
               ElevatedButton.icon(
@@ -116,6 +115,7 @@ class ProfileManageSheet {
                   ),
                 ),
               ),
+              const SizedBox(height: 24), // ✅ 버튼 하단 여백
             ],
           ),
         ),
@@ -146,7 +146,12 @@ class ProfileManageSheet {
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
                 controller.addProfile(nameController.text.trim());
-                Get.back();
+                // ✅ 새로 추가된 프로필로 자동 전환
+                controller.selectedChildId.value = controller.profiles.last.id;
+                controller.isOverlapView.value = false;
+                controller.refreshUI();
+                Get.back(); // 다이얼로그 닫기
+                Get.back(); // 바닥 시트도 닫기
               }
             },
             child: const Text(

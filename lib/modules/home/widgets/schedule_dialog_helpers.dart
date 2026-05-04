@@ -14,6 +14,8 @@ const Map<String, String> academyImages = {
   '독서': 'ic_read.png',
   '과학': 'ic_science.png',
   '학교': 'ic_school.png',
+  '수영': 'ic_swimming.png', // ✅ 추가
+  '축구': 'ic_soccer.png',
 };
 
 const List<Color> pastelColors = [

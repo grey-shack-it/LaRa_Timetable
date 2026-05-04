@@ -136,6 +136,7 @@ class HomeController extends GetxController {
     startHour.value = min.clamp(0, 23);
     endHour.value = max.clamp(1, 24);
     schedules.refresh();
+    update();
   }
 
   void loadSchedules() {
@@ -185,9 +186,10 @@ class HomeController extends GetxController {
     if (schedule.key != null) {
       AlarmService.cancelScheduleAlarms(schedule);
     }
-    schedule.delete();
-    schedules.remove(schedule);
-    schedules.refresh();
+    if (schedule.isInBox) {
+      schedule.delete();
+    }
+    loadSchedules(); // ✅ refresh 대신 다시 로드
   }
 
   void updateScheduleTime(Schedule schedule, int day, double localY) {
