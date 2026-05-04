@@ -54,10 +54,18 @@ class ImageSaveService {
           colorText: Colors.white,
           margin: const EdgeInsets.all(16),
         );
+      } else {
+        // ✅ 추가
+        Get.snackbar(
+          '저장 실패',
+          '갤러리 저장에 실패했어요. 저장 권한을 확인해주세요.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
       Get.back();
-      print('저장 오류: $e');
       Get.snackbar(
         '저장 실패',
         '이미지 저장 중 오류가 발생했어요.',

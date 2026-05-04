@@ -23,13 +23,12 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       dayOfWeek: fields[3] as int,
       memo: fields[5] as String,
       iconName: fields[4] as String?,
-      // ignore: dead_code
-      colorValue: fields[6] as int ?? 0xFFC09FF8, // 기본값 설정
-      childId: fields[7] as String ?? 'default', // 기본값 설정
-      startAlarm: fields[8] as bool? ?? false,
-      startAlarmMinutes: fields[9] as int? ?? 10,
-      endAlarm: fields[10] as bool? ?? false,
-      endAlarmMinutes: fields[11] as int? ?? 10,
+      colorValue: fields[6] as int,
+      childId: fields[7] as String,
+      startAlarm: fields[8] as bool,
+      startAlarmMinutes: fields[9] as int,
+      endAlarm: fields[10] as bool,
+      endAlarmMinutes: fields[11] as int,
     );
   }
 

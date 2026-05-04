@@ -174,6 +174,8 @@ class ScheduleBlock extends StatelessWidget {
       '독서': 'ic_read.png',
       '과학': 'ic_science.png',
       '학교': 'ic_school.png',
+      '수영': 'ic_swimming.png',
+      '축구': 'ic_soccer.png',
     };
 
     final fileName = academyImages[name];

@@ -1,35 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../home_controller.dart';
 import '../../../constants/app_colors.dart';
 import '../../../data/schedule.dart';
 import '../../../services/alarm_service.dart';
+import 'schedule_dialog_helpers.dart'; // ✅ 공통 헬퍼 import
 
 class EditScheduleDialog {
-  static const Map<String, String> academyImages = {
-    '국어': 'ic_korean.png',
-    '영어': 'ic_english.png',
-    '수학': 'ic_math.png',
-    '미술': 'ic_art.png',
-    '태권도': 'ic_taekwondo.png',
-    '피아노': 'ic_piano.png',
-    '독서': 'ic_read.png',
-    '과학': 'ic_science.png',
-    '학교': 'ic_school.png',
-  };
-
-  static const List<Color> pastelColors = [
-    Color(0xFFC09FF8),
-    Color(0xFFFFF59D),
-    Color(0xFFFFCCBC),
-    Color(0xFFFFAB91),
-    Color(0xFFA5D6A7),
-    Color(0xFF90CAF9),
-  ];
-
-  static const List<String> days = ['월', '화', '수', '목', '금', '토', '일'];
-
   static void showEditOrDelete(
     BuildContext context,
     HomeController controller,
@@ -91,7 +68,7 @@ class EditScheduleDialog {
     final endTime = schedule.endTime.obs;
     final selectedIcon = (schedule.iconName ?? '국어').obs;
     final selectedColor = Color(schedule.colorValue).obs;
-    final selectedDay = schedule.dayOfWeek.obs;
+    final selectedDay = schedule.dayOfWeek.obs; // ✅ 요일 상태
     final startAlarm = schedule.startAlarm.obs;
     final startAlarmMinutes = schedule.startAlarmMinutes.obs;
     final endAlarm = schedule.endAlarm.obs;
@@ -147,8 +124,7 @@ class EditScheduleDialog {
                     final selectedIndex = iconKeys.indexOf(selectedIcon.value);
                     if (selectedIndex >= 0) {
                       final row = (selectedIndex ~/ 4);
-                      final itemHeight = 75.0;
-                      final scrollTo = (row * itemHeight).clamp(
+                      final scrollTo = (row * 75.0).clamp(
                         0.0,
                         scrollController.position.maxScrollExtent,
                       );
@@ -201,9 +177,7 @@ class EditScheduleDialog {
                                   selectedIcon.value = name;
                                   final index = iconKeys.indexOf(name);
                                   final row = (index ~/ 4);
-                                  final itemHeight = 75.0;
-                                  final targetScroll =
-                                      (row * itemHeight) - 37.5;
+                                  final targetScroll = (row * 75.0) - 37.5;
                                   scrollController.animateTo(
                                     targetScroll.clamp(
                                       0.0,
@@ -229,7 +203,10 @@ class EditScheduleDialog {
                                           ]
                                         : [],
                                   ),
-                                  child: _buildAcademyIcon(name, size: 55),
+                                  child: buildAcademyIcon(
+                                    name,
+                                    size: 55,
+                                  ), // ✅ 헬퍼 사용
                                 ),
                               );
                             }).toList(),
@@ -269,7 +246,7 @@ class EditScheduleDialog {
               ),
               const SizedBox(height: 10),
 
-              // 요일 선택
+              // ✅ 요일 선택 (기존에 누락됐던 UI 추가)
               Obx(
                 () => Wrap(
                   spacing: 7,
@@ -286,16 +263,17 @@ class EditScheduleDialog {
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
 
               // 시작 시간 + 알람
               Obx(
                 () => Row(
                   children: [
                     GestureDetector(
-                      onTap: () => _showPicker(
+                      onTap: () => showScheduleTimePicker(
                         startTime.value,
                         (d) => startTime.value = d,
-                      ),
+                      ), // ✅ 헬퍼 사용
                       child: Row(
                         children: [
                           const Text('시작 시간  ', style: TextStyle(fontSize: 16)),
@@ -313,7 +291,8 @@ class EditScheduleDialog {
                     ),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () => _showAlarmMinutePicker(startAlarmMinutes),
+                      onTap: () =>
+                          showAlarmMinutePicker(startAlarmMinutes), // ✅ 헬퍼 사용
                       child: Text(
                         '${startAlarmMinutes.value}분전 알림',
                         style: const TextStyle(
@@ -338,8 +317,10 @@ class EditScheduleDialog {
                 () => Row(
                   children: [
                     GestureDetector(
-                      onTap: () =>
-                          _showPicker(endTime.value, (d) => endTime.value = d),
+                      onTap: () => showScheduleTimePicker(
+                        endTime.value,
+                        (d) => endTime.value = d,
+                      ), // ✅ 헬퍼 사용
                       child: Row(
                         children: [
                           const Text('종료 시간  ', style: TextStyle(fontSize: 16)),
@@ -357,7 +338,8 @@ class EditScheduleDialog {
                     ),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () => _showAlarmMinutePicker(endAlarmMinutes),
+                      onTap: () =>
+                          showAlarmMinutePicker(endAlarmMinutes), // ✅ 헬퍼 사용
                       child: Text(
                         '${endAlarmMinutes.value}분전 알림',
                         style: const TextStyle(
@@ -384,7 +366,7 @@ class EditScheduleDialog {
                   schedule.title = titleController.text;
                   schedule.startTime = startTime.value;
                   schedule.endTime = endTime.value;
-                  schedule.dayOfWeek = selectedDay.value;
+                  schedule.dayOfWeek = selectedDay.value; // ✅ 요일 저장
                   schedule.iconName = selectedIcon.value;
                   schedule.colorValue = selectedColor.value.value;
                   schedule.startAlarm = startAlarm.value;
@@ -418,143 +400,6 @@ class EditScheduleDialog {
           ),
         ),
       ),
-    );
-  }
-
-  static void _showPicker(DateTime current, Function(DateTime) onSelected) {
-    final tempTime = current.obs;
-    Get.bottomSheet(
-      Container(
-        height: 300,
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        child: Column(
-          children: [
-            const Text(
-              '시간 선택',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: AppColors.darkPurple,
-              ),
-            ),
-            Expanded(
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.time,
-                initialDateTime: current,
-                use24hFormat: true,
-                minuteInterval: 5,
-                onDateTimeChanged: (d) => tempTime.value = d,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                onSelected(tempTime.value);
-                Get.back();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.mainPurple,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text('확인', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static void _showAlarmMinutePicker(RxInt targetMinutes) {
-    final List<int> minuteOptions = [
-      5,
-      10,
-      15,
-      20,
-      25,
-      30,
-      35,
-      40,
-      45,
-      50,
-      55,
-      60,
-    ];
-    final initialIndex = minuteOptions
-        .indexOf(targetMinutes.value)
-        .clamp(0, minuteOptions.length - 1);
-    final fixedController = FixedExtentScrollController(
-      initialItem: initialIndex,
-    );
-
-    Get.bottomSheet(
-      Container(
-        height: 250,
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        child: Column(
-          children: [
-            const Text(
-              '알림 시간 설정',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: AppColors.darkPurple,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: CupertinoPicker(
-                scrollController: fixedController,
-                itemExtent: 44,
-                onSelectedItemChanged: (index) {
-                  targetMinutes.value = minuteOptions[index];
-                },
-                children: minuteOptions
-                    .map(
-                      (m) => Center(
-                        child: Text(
-                          '$m분 전',
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () => Get.back(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.mainPurple,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text('확인', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static Widget _buildAcademyIcon(String name, {required double size}) {
-    final fileName = academyImages[name];
-    if (fileName == null) return const SizedBox.shrink();
-    return Image.asset(
-      'assets/icons/$fileName',
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
     );
   }
 }

@@ -12,6 +12,7 @@ import 'widgets/add_schedule_dialog.dart';
 import 'widgets/edit_schedule_dialog.dart';
 import 'widgets/time_grid.dart';
 import '../../data/schedule.dart';
+import 'package:flutter/foundation.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -24,13 +25,17 @@ class _HomeViewState extends State<HomeView> {
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
   final ScreenshotController screenshotController = ScreenshotController();
+  late final HomeController controller;
 
-  static const String _adUnitId = 'ca-app-pub-3940256099942544/6300978111';
-  // 실제 배포 ID: ca-app-pub-8035187743335742/8495628808
+  static const String _adUnitId = kDebugMode
+      ? 'ca-app-pub-3940256099942544/6300978111'
+      : 'ca-app-pub-8035187743335742/8495628808';
 
+  @override
   @override
   void initState() {
     super.initState();
+    controller = Get.put(HomeController(), permanent: true); // ✅ 추가
     _loadBannerAd();
   }
 
@@ -45,7 +50,7 @@ class _HomeViewState extends State<HomeView> {
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          print('배너 광고 로드 실패: $error');
+          debugPrint('배너 광고 로드 실패: $error');
         },
       ),
     )..load();
@@ -59,11 +64,6 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final HomeController controller = Get.put(
-      HomeController(),
-      permanent: true,
-    );
-
     return Scaffold(
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
@@ -134,9 +134,6 @@ class _HomeViewState extends State<HomeView> {
                           Expanded(
                             child: SingleChildScrollView(
                               child: Obx(() {
-                                print(
-                                  "🔥 일정 개수 ${controller.currentSchedules.length}",
-                                );
                                 int start = controller.startHour.value;
                                 int end = controller.endHour.value;
                                 int totalHours = end - start + 1;

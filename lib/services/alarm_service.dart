@@ -5,6 +5,7 @@ import '../data/schedule.dart';
 import 'package:get/get.dart'; // ✅ 추가
 import '../modules/home/home_controller.dart'; // ✅ 추가
 import 'package:device_info_plus/device_info_plus.dart'; // ✅ 추가
+import 'package:flutter/foundation.dart';
 
 class AlarmService {
   static final FlutterLocalNotificationsPlugin _notifications =
@@ -30,7 +31,7 @@ class AlarmService {
           >()
           ?.requestNotificationsPermission();
     } catch (e) {
-      print('알림 권한 요청 오류: $e');
+      debugPrint('알림 권한 요청 오류: $e');
     }
 
     try {
@@ -43,7 +44,7 @@ class AlarmService {
             ?.requestExactAlarmsPermission();
       }
     } catch (e) {
-      print('정확한 알람 권한 요청 오류: $e');
+      debugPrint('정확한 알람 권한 요청 오류: $e');
     }
 
     _initialized = true;
@@ -80,7 +81,7 @@ class AlarmService {
       );
     } catch (e) {
       // ✅ 추가
-      print('알람 예약 중 오류: $e');
+      debugPrint('알람 예약 중 오류: $e');
     }
   }
 
