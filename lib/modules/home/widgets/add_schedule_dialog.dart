@@ -8,8 +8,17 @@ class AddScheduleDialog {
   static void show(BuildContext context, HomeController controller) {
     final titleController = TextEditingController();
     final now = DateTime.now();
-    final startTime = DateTime(2024, 1, 1, now.hour, 0).obs;
-    final endTime = DateTime(2024, 1, 1, now.hour + 1, 0).obs;
+    final roundedMinute = ((now.minute / 10).ceil() * 10);
+    final startHour = roundedMinute == 60 ? now.hour + 1 : now.hour;
+    final startMinute = roundedMinute == 60 ? 0 : roundedMinute;
+    final startTime = DateTime(2024, 1, 1, startHour, startMinute).obs;
+    final endTime = DateTime(
+      2024,
+      1,
+      1,
+      startHour + 1,
+      startMinute,
+    ).obs; // ✅ now.hour+1 대신 startHour+1
     final selectedIcon = academyImages.keys.first.obs;
     final selectedColor = pastelColors.first.obs;
     final selectedDays = <int>{_currentDayOfWeek()}.obs;

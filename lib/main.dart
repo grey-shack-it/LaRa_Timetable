@@ -21,7 +21,11 @@ void main() async {
   await Hive.openBox<Schedule>('schedules');
   await Hive.openBox<ChildProfile>('profiles'); // ✅ 추가
 
-  await AlarmService.init();
+  try {
+    await AlarmService.init();
+  } catch (e) {
+    debugPrint('AlarmService 초기화 오류: $e');
+  }
   await MobileAds.instance.initialize();
 
   FlutterNativeSplash.remove();

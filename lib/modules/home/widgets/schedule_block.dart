@@ -81,7 +81,10 @@ class ScheduleBlock extends StatelessWidget {
 
       return Container(
         decoration: BoxDecoration(
-          color: Color(schedule.colorValue),
+          color: isOverlap && controller.isOverlappingWithOthers(schedule)
+              ? Colors
+                    .white // ✅ 겹칠 때 흰색
+              : Color(schedule.colorValue), // 겹치지 않을 때 기존 색
           borderRadius: BorderRadius.circular(12),
           border: isOverlap && controller.isOverlappingWithOthers(schedule)
               ? Border.all(color: AppColors.darkPurple, width: 2.5)

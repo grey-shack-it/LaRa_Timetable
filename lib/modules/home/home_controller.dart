@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../data/schedule.dart';
-import '../../data/child_profile.dart'; // ✅ 추가
+import '../../data/child_profile.dart';
 import 'package:flutter/material.dart';
 import '../../services/alarm_service.dart';
 
@@ -13,7 +13,7 @@ class HomeController extends GetxController {
   RxInt startHour = 7.obs;
   RxInt endHour = 21.obs;
 
-  final RxList<ChildProfile> profiles = <ChildProfile>[].obs; // ✅ 초기값 제거
+  final RxList<ChildProfile> profiles = <ChildProfile>[].obs;
   final RxString selectedChildId = ''.obs;
   final RxBool isOverlapView = false.obs;
 
@@ -55,28 +55,23 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadProfiles(); // ✅ 프로필 먼저 로드
+    loadProfiles();
     loadSchedules();
     Stream.periodic(const Duration(seconds: 1)).listen((_) {
       now.value = DateTime.now();
     });
   }
 
-  // ✅ Hive에서 프로필 불러오기
   void loadProfiles() {
     final box = Hive.box<ChildProfile>('profiles');
-
-    // 저장된 프로필이 없으면 기본 프로필 생성
     if (box.isEmpty) {
       final defaultProfile = ChildProfile(id: 'default', name: '첫째');
       box.add(defaultProfile);
     }
-
     profiles.assignAll(box.values.toList());
     selectedChildId.value = profiles.first.id;
   }
 
-  // ✅ 프로필 추가 — Hive에 저장
   void addProfile(String name) {
     final box = Hive.box<ChildProfile>('profiles');
     final newProfile = ChildProfile(
@@ -87,21 +82,18 @@ class HomeController extends GetxController {
     profiles.assignAll(box.values.toList());
   }
 
-  // ✅ 프로필 이름 수정 — Hive에 저장
   void updateProfile(String id, String newName) {
     final profile = profiles.firstWhereOrNull((p) => p.id == id);
     if (profile != null) {
       profile.name = newName;
-      profile.save(); // ✅ HiveObject의 save() 사용
+      profile.save();
       profiles.refresh();
     }
   }
 
-  // ✅ 프로필 삭제 — Hive에서도 삭제
   void deleteProfile(String id) {
     if (profiles.length <= 1) return;
 
-    // 해당 아이 일정 삭제
     final toDelete = schedules.where((s) => s.childId == id).toList();
     for (var s in toDelete) {
       AlarmService.cancelScheduleAlarms(s);
@@ -109,10 +101,9 @@ class HomeController extends GetxController {
     }
     schedules.removeWhere((s) => s.childId == id);
 
-    // 프로필 Hive에서 삭제
     final profile = profiles.firstWhereOrNull((p) => p.id == id);
     if (profile != null) {
-      profile.delete(); // ✅ HiveObject의 delete() 사용
+      profile.delete();
     }
     profiles.removeWhere((p) => p.id == id);
 
@@ -140,7 +131,7 @@ class HomeController extends GetxController {
   }
 
   void loadSchedules() {
-    var box = Hive.box<Schedule>('schedules');
+    final box = Hive.box<Schedule>('schedules');
     schedules.assignAll(box.values.toList());
     refreshUI();
   }
@@ -158,7 +149,7 @@ class HomeController extends GetxController {
     bool endAlarm = false,
     int endAlarmMinutes = 10,
   }) async {
-    var box = Hive.box<Schedule>('schedules');
+    final box = Hive.box<Schedule>('schedules');
     final newSchedule = Schedule(
       title: title,
       startTime: start,
@@ -175,11 +166,8 @@ class HomeController extends GetxController {
     );
 
     box.add(newSchedule);
-    await AlarmService.registerScheduleAlarms(newSchedule);
-    schedules.assignAll(box.values.toList());
-    schedules.value = List.from(schedules);
-    refreshUI();
-    update();
+    loadSchedules(); // ✅ 즉시 화면 갱신
+    unawaited(AlarmService.registerScheduleAlarms(newSchedule)); // ✅ 알람은 백그라운드
   }
 
   void deleteSchedule(Schedule schedule) {
@@ -189,7 +177,7 @@ class HomeController extends GetxController {
     if (schedule.isInBox) {
       schedule.delete();
     }
-    loadSchedules(); // ✅ refresh 대신 다시 로드
+    loadSchedules();
   }
 
   void updateScheduleTime(Schedule schedule, int day, double localY) {
