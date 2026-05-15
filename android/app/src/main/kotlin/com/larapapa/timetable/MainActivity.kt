@@ -1,4 +1,4 @@
-package com.example.my_timeline_app
+package com.larapapa.timetable
 
 import io.flutter.embedding.android.FlutterActivity
 
