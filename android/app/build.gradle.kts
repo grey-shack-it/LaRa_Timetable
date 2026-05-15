@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.my_timeline_app"
+    namespace = "com.larapapa.timetable"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

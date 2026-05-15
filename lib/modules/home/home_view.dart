@@ -283,6 +283,8 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
           if (_isAdLoaded && _bannerAd != null)
+            Container(height: 1, color: AppColors.gridLine),
+          if (_isAdLoaded && _bannerAd != null)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
               height: _bannerAd!.size.height.toDouble(),
@@ -290,10 +292,17 @@ class _HomeViewState extends State<HomeView> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.mainPurple,
-        onPressed: () => AddScheduleDialog.show(context, controller),
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(
+          bottom: _isAdLoaded && _bannerAd != null
+              ? _bannerAd!.size.height.toDouble()
+              : 0,
+        ),
+        child: FloatingActionButton(
+          backgroundColor: AppColors.mainPurple,
+          onPressed: () => AddScheduleDialog.show(context, controller),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
