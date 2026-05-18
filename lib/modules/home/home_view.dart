@@ -32,10 +32,9 @@ class _HomeViewState extends State<HomeView> {
       : 'ca-app-pub-8035187743335742/8495628808';
 
   @override
-  @override
   void initState() {
     super.initState();
-    controller = Get.put(HomeController(), permanent: true); // ✅ 추가
+    controller = Get.put(HomeController(), permanent: true);
     _loadBannerAd();
   }
 
@@ -94,215 +93,200 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SafeArea(
+
+      // ✅ 광고 배너를 bottomNavigationBar로 이동 — SafeArea로 네비게이션바 겹침 방지
+      bottomNavigationBar: _isAdLoaded && _bannerAd != null
+          ? SafeArea(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ProfileTabBar(controller: controller),
-                  Expanded(
-                    child: Screenshot(
-                      controller: screenshotController,
-                      child: Column(
-                        children: [
-                          // 요일 헤더
-                          Row(
-                            children: [
-                              const SizedBox(width: 45),
-                              ...List.generate(
-                                7,
-                                (index) => Expanded(
-                                  child: DayHeader(
-                                    label: [
-                                      '월',
-                                      '화',
-                                      '수',
-                                      '목',
-                                      '금',
-                                      '토',
-                                      '일',
-                                    ][index],
-                                    dayNum: index + 1,
-                                  ),
-                                ),
-                              ),
-                            ],
+                  Container(height: 1, color: AppColors.gridLine),
+                  SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ],
+              ),
+            )
+          : null,
+
+      body: SafeArea(
+        child: Column(
+          children: [
+            ProfileTabBar(controller: controller),
+            Expanded(
+              child: Screenshot(
+                controller: screenshotController,
+                child: Column(
+                  children: [
+                    // 요일 헤더
+                    Row(
+                      children: [
+                        const SizedBox(width: 45),
+                        ...List.generate(
+                          7,
+                          (index) => Expanded(
+                            child: DayHeader(
+                              label: ['월', '화', '수', '목', '금', '토', '일'][index],
+                              dayNum: index + 1,
+                            ),
                           ),
+                        ),
+                      ],
+                    ),
 
-                          // 시간표 그리드
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Obx(() {
-                                final _ = controller.selectedChildId.value;
-                                final __ = controller.schedules.length;
-                                int start = controller.startHour.value;
-                                int end = controller.endHour.value;
-                                int totalHours = end - start + 1;
+                    // 시간표 그리드
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Obx(() {
+                          final _ = controller.selectedChildId.value;
+                          final __ = controller.schedules.length;
+                          int start = controller.startHour.value;
+                          int end = controller.endHour.value;
+                          int totalHours = end - start + 1;
 
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // 시간축
-                                    SizedBox(
-                                      width: 45,
-                                      child: Column(
-                                        children: List.generate(
-                                          totalHours,
-                                          (i) => Container(
-                                            height: 60,
-                                            decoration: BoxDecoration(
-                                              border: Border(
-                                                bottom: BorderSide(
-                                                  color: AppColors.gridLine
-                                                      .withValues(alpha: 0.8),
-                                                  width: 0.8,
-                                                ),
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                '${start + i}시',
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: AppColors.darkPurple,
-                                                  fontWeight: FontWeight.w900,
-                                                ),
-                                              ),
-                                            ),
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 시간축
+                              SizedBox(
+                                width: 45,
+                                child: Column(
+                                  children: List.generate(
+                                    totalHours,
+                                    (i) => Container(
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: AppColors.gridLine
+                                                .withValues(alpha: 0.8),
+                                            width: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '${start + i}시',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppColors.darkPurple,
+                                            fontWeight: FontWeight.w900,
                                           ),
                                         ),
                                       ),
                                     ),
+                                  ),
+                                ),
+                              ),
 
-                                    // 요일별 그리드
-                                    ...List.generate(7, (index) {
-                                      int dayNum = index + 1;
-                                      return Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              left: BorderSide(
-                                                color: AppColors.gridLine
-                                                    .withValues(alpha: 0.8),
-                                                width: 1.5,
-                                              ),
-                                            ),
+                              // 요일별 그리드
+                              ...List.generate(7, (index) {
+                                int dayNum = index + 1;
+                                return Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: AppColors.gridLine.withValues(
+                                            alpha: 0.8,
                                           ),
-                                          child: Builder(
-                                            builder: (dropContext) {
-                                              return DragTarget<Schedule>(
-                                                onWillAcceptWithDetails:
-                                                    (details) => true,
-                                                onAcceptWithDetails: (details) {
-                                                  final RenderBox box =
-                                                      dropContext
-                                                              .findRenderObject()
-                                                          as RenderBox;
-                                                  final Offset localOffset = box
-                                                      .globalToLocal(
-                                                        details.offset,
-                                                      );
-                                                  double adjustedY =
-                                                      localOffset.dy +
-                                                      (start * 60.0);
-                                                  controller.updateScheduleTime(
-                                                    details.data,
-                                                    dayNum,
-                                                    adjustedY,
-                                                  );
-                                                },
-                                                builder:
-                                                    (
-                                                      context,
-                                                      candidateData,
-                                                      rejectedData,
-                                                    ) {
-                                                      return SizedBox(
-                                                        height:
-                                                            totalHours * 60.0,
-                                                        child: Stack(
-                                                          children: [
-                                                            GridLines(
-                                                              hours: totalHours,
-                                                            ),
-                                                            ...controller
-                                                                .displaySchedules
-                                                                .where(
-                                                                  (s) =>
-                                                                      s.dayOfWeek ==
-                                                                      dayNum,
-                                                                )
-                                                                .map(
-                                                                  (
-                                                                    s,
-                                                                  ) => ScheduleBlock(
-                                                                    controller:
-                                                                        controller,
-                                                                    schedule: s,
-                                                                    startHour:
-                                                                        start,
-                                                                    onTap: () =>
-                                                                        EditScheduleDialog.showEditOrDelete(
-                                                                          context,
-                                                                          controller,
-                                                                          s,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                            if (dayNum ==
-                                                                DateTime.now()
-                                                                    .weekday)
-                                                              CurrentTimeLine(
-                                                                controller:
-                                                                    controller,
-                                                                startHour:
-                                                                    start,
-                                                              ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                              );
-                                            },
-                                          ),
+                                          width: 1.5,
                                         ),
-                                      );
-                                    }),
-                                  ],
+                                      ),
+                                    ),
+                                    child: Builder(
+                                      builder: (dropContext) {
+                                        return DragTarget<Schedule>(
+                                          onWillAcceptWithDetails: (details) =>
+                                              true,
+                                          onAcceptWithDetails: (details) {
+                                            final RenderBox box =
+                                                dropContext.findRenderObject()
+                                                    as RenderBox;
+                                            final Offset localOffset = box
+                                                .globalToLocal(details.offset);
+                                            double adjustedY =
+                                                localOffset.dy + (start * 60.0);
+                                            controller.updateScheduleTime(
+                                              details.data,
+                                              dayNum,
+                                              adjustedY,
+                                            );
+                                          },
+                                          builder:
+                                              (
+                                                context,
+                                                candidateData,
+                                                rejectedData,
+                                              ) {
+                                                return SizedBox(
+                                                  height: totalHours * 60.0,
+                                                  child: Stack(
+                                                    children: [
+                                                      GridLines(
+                                                        hours: totalHours,
+                                                      ),
+                                                      ...controller
+                                                          .displaySchedules
+                                                          .where(
+                                                            (s) =>
+                                                                s.dayOfWeek ==
+                                                                dayNum,
+                                                          )
+                                                          .map(
+                                                            (
+                                                              s,
+                                                            ) => ScheduleBlock(
+                                                              controller:
+                                                                  controller,
+                                                              schedule: s,
+                                                              startHour: start,
+                                                              onTap: () =>
+                                                                  EditScheduleDialog.showEditOrDelete(
+                                                                    context,
+                                                                    controller,
+                                                                    s,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                      if (dayNum ==
+                                                          DateTime.now()
+                                                              .weekday)
+                                                        CurrentTimeLine(
+                                                          controller:
+                                                              controller,
+                                                          startHour: start,
+                                                        ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 );
                               }),
-                            ),
-                          ),
-                        ],
+                            ],
+                          );
+                        }),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          if (_isAdLoaded && _bannerAd != null)
-            Container(height: 1, color: AppColors.gridLine),
-          if (_isAdLoaded && _bannerAd != null)
-            SizedBox(
-              width: _bannerAd!.size.width.toDouble(),
-              height: _bannerAd!.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd!),
-            ),
-        ],
+          ],
+        ),
       ),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: _isAdLoaded && _bannerAd != null
-              ? _bannerAd!.size.height.toDouble()
-              : 0,
-        ),
-        child: FloatingActionButton(
-          backgroundColor: AppColors.mainPurple,
-          onPressed: () => AddScheduleDialog.show(context, controller),
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+
+      // ✅ + 버튼은 패딩 없이 그냥 사용 (bottomNavigationBar가 알아서 위에 배치)
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.mainPurple,
+        onPressed: () => AddScheduleDialog.show(context, controller),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

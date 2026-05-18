@@ -85,7 +85,7 @@ class ImageSaveService {
     final int bottomBannerHeight = (ttWidth * 0.2).toInt(); // 홍보 배너
     final int bottomPadding = (ttWidth * 0.1).toInt(); // 하단 검은 여백
 
-    // ✅ Y축 위치 계산 (위에서부터 순서대로)
+    // ✅ Y축 위치 계산
     final int titleBannerTop = topPadding;
     final int timeTableTop = topPadding + topBannerHeight;
     final int bottomBannerTop = topPadding + topBannerHeight + ttHeight;
@@ -93,35 +93,30 @@ class ImageSaveService {
         topPadding + topBannerHeight + ttHeight + bottomBannerHeight;
     final int totalHeight = bottomPaddingTop + bottomPadding;
 
-    // 이미지 로드
-    final ByteData logoData = await rootBundle.load(
-      'assets/images/larapapa.png',
+    // ✅ 배너 이미지 로드 (기존 로고+QR+텍스트 대신 단일 PNG)
+    final ByteData bannerData = await rootBundle.load(
+      'assets/images/banner_bottom.png',
     );
-    final ui.Image logoImage = await decodeImageFromList(
-      logoData.buffer.asUint8List(),
-    );
-
-    final ByteData qrData = await rootBundle.load('assets/images/qr_code.png');
-    final ui.Image qrImage = await decodeImageFromList(
-      qrData.buffer.asUint8List(),
+    final ui.Image bannerImage = await decodeImageFromList(
+      bannerData.buffer.asUint8List(),
     );
 
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
 
-    // ✅ 1. 전체 배경 (연보라)
+    // 1. 전체 배경 (연보라)
     canvas.drawRect(
       Rect.fromLTWH(0, 0, ttWidth.toDouble(), totalHeight.toDouble()),
       Paint()..color = const Color(0xFFE5D9F9),
     );
 
-    // ✅ 2. 상단 검은 여백
+    // 2. 상단 검은 여백
     canvas.drawRect(
       Rect.fromLTWH(0, 0, ttWidth.toDouble(), topPadding.toDouble()),
       Paint()..color = Colors.black,
     );
 
-    // ✅ 3. 타이틀 텍스트
+    // 3. 타이틀 텍스트
     final title = controller.isOverlapView.value
         ? '아이들 시간표'
         : '${controller.getProfileName(controller.selectedChildId.value)}의 시간표';
@@ -146,21 +141,10 @@ class ImageSaveService {
       ),
     );
 
-    // ✅ 4. 시간표 이미지
+    // 4. 시간표 이미지
     canvas.drawImage(ttImage, Offset(0, timeTableTop.toDouble()), Paint());
 
-    // ✅ 5. 홍보 배너 배경 (흰색)
-    canvas.drawRect(
-      Rect.fromLTWH(
-        0,
-        bottomBannerTop.toDouble(),
-        ttWidth.toDouble(),
-        bottomBannerHeight.toDouble(),
-      ),
-      Paint()..color = Colors.white,
-    );
-
-    // ✅ 6. 구분선
+    // 5. 구분선
     canvas.drawLine(
       Offset(0, bottomBannerTop.toDouble()),
       Offset(ttWidth.toDouble(), bottomBannerTop.toDouble()),
@@ -169,70 +153,25 @@ class ImageSaveService {
         ..strokeWidth = 2,
     );
 
-    // ✅ 7. 홍보 배너 내용 (3등분)
-    final double sectionWidth = ttWidth / 3;
-    final double bannerTop = bottomBannerTop.toDouble();
-    final double logoSize = bottomBannerHeight * 0.98;
-    final double itemSize = bottomBannerHeight * 0.98;
-
-    // 왼쪽 - 홍보 문구
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        children: [
-          TextSpan(
-            text: '복잡한 아이들 학원시간\n이제 한눈에 쏙!\n',
-            style: TextStyle(
-              color: Color(0xFF9F75E3),
-              fontSize: 40,
-              fontWeight: FontWeight.w900,
-              height: 1.5,
-            ),
-          ),
-          TextSpan(
-            text: '라라 시간표',
-            style: TextStyle(
-              color: Color(0xFFC09FF8),
-              fontSize: 45,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(maxWidth: sectionWidth - 20);
-    textPainter.paint(
-      canvas,
-      Offset(20, bannerTop + (bottomBannerHeight - textPainter.height) / 2),
-    );
-
-    // 가운데 - 로고
-    final double logoX = sectionWidth + (sectionWidth - logoSize) / 2;
-    final double logoY = bannerTop + (bottomBannerHeight - logoSize) / 2;
+    // 6. ✅ 홍보 배너 — 단일 PNG 이미지로 교체
     canvas.drawImageRect(
-      logoImage,
+      bannerImage,
       Rect.fromLTWH(
         0,
         0,
-        logoImage.width.toDouble(),
-        logoImage.height.toDouble(),
+        bannerImage.width.toDouble(),
+        bannerImage.height.toDouble(),
       ),
-      Rect.fromLTWH(logoX, logoY, logoSize, logoSize),
+      Rect.fromLTWH(
+        0,
+        bottomBannerTop.toDouble(),
+        ttWidth.toDouble(),
+        bottomBannerHeight.toDouble(),
+      ),
       Paint(),
     );
 
-    // 오른쪽 - QR코드
-    final double qrSize = itemSize * 0.9;
-    final double qrX = sectionWidth * 2 + (sectionWidth - qrSize) / 2;
-    final double qrY = bannerTop + (bottomBannerHeight - qrSize) / 2;
-    canvas.drawImageRect(
-      qrImage,
-      Rect.fromLTWH(0, 0, qrImage.width.toDouble(), qrImage.height.toDouble()),
-      Rect.fromLTWH(qrX, qrY, qrSize, qrSize),
-      Paint(),
-    );
-
-    // ✅ 8. 하단 검은 여백 (맨 마지막에 그려야 덮어씌워지지 않음)
+    // 7. 하단 검은 여백 (맨 마지막에 그려야 덮어씌워지지 않음)
     canvas.drawRect(
       Rect.fromLTWH(
         0,

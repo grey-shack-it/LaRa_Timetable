@@ -115,7 +115,7 @@ class ProfileManageSheet {
                   ),
                 ),
               ),
-              const SizedBox(height: 24), // ✅ 버튼 하단 여백
+              SizedBox(height: MediaQuery.of(Get.context!).padding.bottom + 24),
             ],
           ),
         ),
