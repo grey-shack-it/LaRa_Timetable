@@ -10,10 +10,14 @@ import 'services/alarm_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:my_timeline_app/constants/app_colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // 추가
+import 'env.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Supabase 초기화 추가
+  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
 
   await Hive.initFlutter();
   Hive.registerAdapter(ScheduleAdapter());

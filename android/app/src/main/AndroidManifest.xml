@@ -18,6 +18,9 @@
         android:label="라라 시간표"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.DEFAULT_SIGN_IN"
+            android:value="DEFAULT_SIGN_IN"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
