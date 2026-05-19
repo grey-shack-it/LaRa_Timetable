@@ -13,6 +13,10 @@ import 'widgets/edit_schedule_dialog.dart';
 import 'widgets/time_grid.dart';
 import '../../data/schedule.dart';
 import 'package:flutter/foundation.dart';
+import '../auth/login_view.dart';
+import '../academy/academy_view.dart';
+import '../../services/auth_service.dart';
+import '../academy/academy_controller.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -89,7 +93,14 @@ class _HomeViewState extends State<HomeView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.people, color: AppColors.darkPurple),
-            onPressed: () => ProfileManageSheet.show(context, controller),
+            onPressed: () {
+              if (AuthService.currentUser != null) {
+                Get.delete<AcademyController>(force: true);
+                Get.off(() => const AcademyView()); // to → off 로 변경
+              } else {
+                Get.to(() => const LoginView());
+              }
+            },
           ),
         ],
       ),

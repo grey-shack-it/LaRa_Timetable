@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../home_controller.dart';
 import '../../../constants/app_colors.dart';
+import '../widgets/profile_manage_sheet.dart';
 
 class ProfileTabBar extends StatelessWidget {
   final HomeController controller;
@@ -107,6 +108,32 @@ class ProfileTabBar extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => ProfileManageSheet.show(Get.context!, controller),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.darkPurple.withValues(alpha: 0.15),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.add,
+                  size: 16,
+                  color: AppColors.darkPurple,
                 ),
               ),
             ),
