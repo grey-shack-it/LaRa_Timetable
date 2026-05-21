@@ -50,6 +50,16 @@ class LoginView extends StatelessWidget {
               },
               child: Image.asset('assets/images/google_logo.png', width: 200),
             ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () async {
+                await AuthService.signInWithKakao();
+                if (AuthService.currentUser != null) {
+                  Get.offAll(() => const AcademyView());
+                }
+              },
+              child: Image.asset('assets/images/kakao_login.png', width: 200),
+            ),
           ],
         ),
       ),

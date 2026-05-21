@@ -12,10 +12,15 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:my_timeline_app/constants/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // 추가
 import 'env.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  KakaoSdk.init(nativeAppKey: '670e1caefa88395fd3dd704d4da13ac8');
+  // 키 해시 확인용 (확인 후 삭제)
+  final keyHash = await KakaoSdk.origin;
+  debugPrint('카카오 키 해시: $keyHash');
   // Supabase 초기화 추가
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
 

@@ -1,6 +1,8 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:my_timeline_app/env.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:flutter/foundation.dart'; // debugPrint
 
 class AuthService {
   static final _supabase = Supabase.instance.client;
@@ -29,10 +31,30 @@ class AuthService {
     }
   }
 
+  // 카카오 로그인
+  static Future<void> signInWithKakao() async {
+    try {
+      OAuthToken token;
+      if (await isKakaoTalkInstalled()) {
+        token = await UserApi.instance.loginWithKakaoTalk();
+      } else {
+        token = await UserApi.instance.loginWithKakaoAccount();
+      }
+
+      await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.kakao,
+        idToken: token.idToken!,
+        accessToken: token.accessToken,
+      );
+    } catch (e) {
+      debugPrint('카카오 로그인 오류: $e');
+    }
+  }
+
   static Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _supabase.auth.signOut();
   }
 
-  static User? get currentUser => _supabase.auth.currentUser;
+  static dynamic get currentUser => _supabase.auth.currentUser;
 }
