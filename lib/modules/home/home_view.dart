@@ -71,6 +71,7 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
         leading: IconButton(
+          iconSize: 38,
           icon: const Icon(Icons.image, color: AppColors.darkPurple),
           onPressed: () =>
               ImageSaveService.saveTimeTable(screenshotController, controller),
@@ -91,16 +92,27 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.people, color: AppColors.darkPurple),
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               if (AuthService.currentUser != null) {
                 Get.delete<AcademyController>(force: true);
-                Get.off(() => const AcademyView()); // to → off 로 변경
+                Get.off(() => const AcademyView());
               } else {
                 Get.to(() => const LoginView());
               }
             },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/images/app_icon.png',
+                  width: 38,
+                  height: 38,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
         ],
       ),

@@ -8,6 +8,11 @@ class AcademyController extends GetxController {
   final _supabase = Supabase.instance.client;
 
   final RxList academyList = [].obs;
+  List get displayAcademyList => isOverlapView.value
+      ? academyList.toList()
+      : academyList
+            .where((a) => a['child_id'] == selectedChildId.value)
+            .toList();
   final RxString selectedChildId = ''.obs;
   final RxBool isOverlapView = false.obs;
   final RxBool isLoading = false.obs;
@@ -15,24 +20,17 @@ class AcademyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // 홈 컨트롤러에서 선택된 아이 ID 가져오기
     final homeController = Get.find<HomeController>();
     selectedChildId.value = homeController.selectedChildId.value;
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
     syncFromTimetable();
-    loadAcademyList();
   }
 
   // 시간표 일정 → 학원 목록 자동 동기화
   Future<void> syncFromTimetable() async {
+    isLoading.value = true;
     final box = Hive.box<Schedule>('schedules');
     final schedules = box.values.toList();
 
-    // 중복 제거 (아이ID + 학원이름 조합)
     final seen = <String>{};
     final unique = schedules.where((s) {
       final key = '${s.childId}_${s.title}';
@@ -40,10 +38,10 @@ class AcademyController extends GetxController {
     }).toList();
 
     for (var s in unique) {
-      // Supabase에 없으면 추가
       final existing = await _supabase
           .from('academy_info')
           .select()
+          .eq('user_id', _supabase.auth.currentUser!.id)
           .eq('child_id', s.childId)
           .eq('name', s.title)
           .maybeSingle();
@@ -60,16 +58,34 @@ class AcademyController extends GetxController {
         });
       }
     }
+    await loadAcademyList();
   }
 
   // 학원 목록 불러오기
   Future<void> loadAcademyList() async {
-    isLoading.value = true;
     final data = await _supabase
         .from('academy_info')
         .select()
         .eq('user_id', _supabase.auth.currentUser!.id);
     academyList.assignAll(data);
     isLoading.value = false;
+  }
+
+  Future<void> updateAcademy(String id, Map<String, dynamic> data) async {
+    await _supabase.from('academy_info').update(data).eq('id', id);
+    await loadAcademyList();
+  }
+
+  Future<void> insertAcademy(Map<String, dynamic> data) async {
+    await _supabase.from('academy_info').insert({
+      'user_id': _supabase.auth.currentUser!.id,
+      ...data,
+    });
+    await loadAcademyList();
+  }
+
+  Future<void> deleteAcademy(String id) async {
+    await _supabase.from('academy_info').delete().eq('id', id);
+    await loadAcademyList();
   }
 }
