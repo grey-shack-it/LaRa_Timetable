@@ -16,7 +16,7 @@ description: "Children's schedule management app."
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+3 #버그수정 (광고배너 위치 _ 팝업창 확인 버튼 위치 수정)
+version: 1.1.0+4 #로그인 기능 추가
 
 environment:
   sdk: ^3.10.4
