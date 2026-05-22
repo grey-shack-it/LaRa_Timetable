@@ -28,6 +28,10 @@ class AcademyController extends GetxController {
   // 시간표 일정 → 학원 목록 자동 동기화
   Future<void> syncFromTimetable() async {
     isLoading.value = true;
+    // ✅ profiles 먼저 확인 후 진행
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+    await _supabase.from('profiles').upsert({'id': user.id});
     final box = Hive.box<Schedule>('schedules');
     final schedules = box.values.toList();
 

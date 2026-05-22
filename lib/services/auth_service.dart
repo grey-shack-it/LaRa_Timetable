@@ -36,7 +36,11 @@ class AuthService {
     try {
       OAuthToken token;
       if (await isKakaoTalkInstalled()) {
-        token = await UserApi.instance.loginWithKakaoTalk();
+        try {
+          token = await UserApi.instance.loginWithKakaoTalk();
+        } catch (e) {
+          token = await UserApi.instance.loginWithKakaoAccount();
+        }
       } else {
         token = await UserApi.instance.loginWithKakaoAccount();
       }
@@ -44,8 +48,13 @@ class AuthService {
       await _supabase.auth.signInWithIdToken(
         provider: OAuthProvider.kakao,
         idToken: token.idToken!,
-        accessToken: token.accessToken,
       );
+
+      // ✅ 로그인 후 profiles에 없으면 자동 추가
+      final user = _supabase.auth.currentUser;
+      if (user != null) {
+        await _supabase.from('profiles').upsert({'id': user.id});
+      }
     } catch (e) {
       debugPrint('카카오 로그인 오류: $e');
     }
