@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import 'academy_controller.dart';
 import 'dart:convert';
 import 'kakao_address_search.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AcademyDetailView extends StatefulWidget {
   final Map<String, dynamic> academy;
@@ -19,7 +20,8 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
   late final TextEditingController nameCtrl;
   late final TextEditingController subjectCtrl;
   late final TextEditingController phoneCtrl;
-  late final TextEditingController kakaoCtrl;
+  late final TextEditingController kakaoOpenchatCtrl;
+  late final TextEditingController websiteCtrl;
   late final TextEditingController shuttleCtrl;
   late final TextEditingController feeCtrl;
   late final TextEditingController memoCtrl;
@@ -39,7 +41,10 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
     nameCtrl = TextEditingController(text: widget.academy['name'] ?? '');
     subjectCtrl = TextEditingController(text: widget.academy['subject'] ?? '');
     phoneCtrl = TextEditingController(text: widget.academy['phone'] ?? '');
-    kakaoCtrl = TextEditingController(text: widget.academy['kakao'] ?? '');
+    kakaoOpenchatCtrl = TextEditingController(
+      text: widget.academy['kakao_openchat'] ?? '',
+    );
+    websiteCtrl = TextEditingController(text: widget.academy['website'] ?? '');
     shuttleCtrl = TextEditingController(
       text: widget.academy['shuttle_location'] ?? '',
     );
@@ -66,7 +71,8 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
     nameCtrl.dispose();
     subjectCtrl.dispose();
     phoneCtrl.dispose();
-    kakaoCtrl.dispose();
+    kakaoOpenchatCtrl.dispose();
+    websiteCtrl.dispose();
     shuttleCtrl.dispose();
     feeCtrl.dispose();
     memoCtrl.dispose();
@@ -106,7 +112,8 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                       'name': nameCtrl.text,
                       'subject': subjectCtrl.text,
                       'phone': phoneCtrl.text,
-                      'kakao': kakaoCtrl.text,
+                      'kakao_openchat': kakaoOpenchatCtrl.text,
+                      'website': websiteCtrl.text,
                       'shuttle_location': shuttleCtrl.text,
                       'fee': int.tryParse(feeCtrl.text) ?? 0,
                       'payment_cycle': selectedCycle.value,
@@ -129,7 +136,8 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                       'name': nameCtrl.text,
                       'subject': subjectCtrl.text,
                       'phone': phoneCtrl.text,
-                      'kakao': kakaoCtrl.text,
+                      'kakao_openchat': kakaoOpenchatCtrl.text,
+                      'website': websiteCtrl.text,
                       'shuttle_location': shuttleCtrl.text,
                       'fee': int.tryParse(feeCtrl.text) ?? 0,
                       'payment_cycle': selectedCycle.value,
@@ -185,15 +193,191 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                 icon: '📞',
                 title: '연락처',
                 children: [
-                  _fieldRow(
-                    '전화번호',
-                    phoneCtrl,
-                    isEditing.value,
-                    keyboardType: TextInputType.phone,
+                  // 전화번호 행
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 80,
+                          child: Text(
+                            '전화번호',
+                            style: TextStyle(
+                              color: AppColors.darkPurple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: isEditing.value
+                              ? TextField(
+                                  controller: phoneCtrl,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                )
+                              : Text(
+                                  phoneCtrl.text.isEmpty ? '-' : phoneCtrl.text,
+                                  style: const TextStyle(
+                                    color: AppColors.darkPurple,
+                                  ),
+                                ),
+                        ),
+                        if (!isEditing.value && phoneCtrl.text.isNotEmpty) ...[
+                          IconButton(
+                            onPressed: () => _makeCall(phoneCtrl.text),
+                            icon: const Icon(
+                              Icons.call,
+                              color: AppColors.mainPurple,
+                              size: 20,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () => _sendSms(phoneCtrl.text),
+                            icon: const Icon(
+                              Icons.sms,
+                              color: AppColors.mainPurple,
+                              size: 20,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                  _fieldRow('카카오톡', kakaoCtrl, isEditing.value),
+                  // 오픈채팅 행
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 80,
+                          child: Text(
+                            '오픈채팅',
+                            style: TextStyle(
+                              color: AppColors.darkPurple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: isEditing.value
+                              ? TextField(
+                                  controller: kakaoOpenchatCtrl,
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                )
+                              : Text(
+                                  kakaoOpenchatCtrl.text.isEmpty
+                                      ? '-'
+                                      : kakaoOpenchatCtrl.text,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.darkPurple,
+                                  ),
+                                ),
+                        ),
+                        if (!isEditing.value &&
+                            kakaoOpenchatCtrl.text.isNotEmpty)
+                          IconButton(
+                            onPressed: () => _openKakao(kakaoOpenchatCtrl.text),
+                            icon: Image.asset(
+                              'assets/images/kakao_icon.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // 웹사이트 행
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 80,
+                          child: Text(
+                            '웹사이트',
+                            style: TextStyle(
+                              color: AppColors.darkPurple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: isEditing.value
+                              ? TextField(
+                                  controller: websiteCtrl,
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                )
+                              : Text(
+                                  websiteCtrl.text.isEmpty
+                                      ? '-'
+                                      : websiteCtrl.text,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.darkPurple,
+                                  ),
+                                ),
+                        ),
+                        if (!isEditing.value && websiteCtrl.text.isNotEmpty)
+                          IconButton(
+                            onPressed: () async {
+                              // 1. 유저 입력값 가져오기 (양쪽 공백 제거)
+                              String inputUrl = websiteCtrl.text.trim();
+
+                              // 2. http:// 또는 https:// 로 시작하지 않으면 강제로 붙여주기
+                              if (!inputUrl.startsWith('http://') &&
+                                  !inputUrl.startsWith('https://')) {
+                                inputUrl = 'https://$inputUrl';
+                              }
+
+                              final uri = Uri.parse(inputUrl);
+
+                              // 3. 실행 가능 여부 확인 후 브라우저 열기
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(
+                                  uri,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              } else {
+                                // 혹시라도 열 수 없는 이상한 주소일 경우를 대비한 알림 (선택 사항)
+                                Get.snackbar(
+                                  '알림',
+                                  '웹사이트를 열 수 없습니다. 주소를 확인해 주세요.',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                );
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.language,
+                              color: AppColors.mainPurple,
+                              size: 20,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
+
               const SizedBox(height: 12),
 
               // 🚌 셔틀위치
@@ -529,6 +713,29 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
         ],
       ),
     );
+  }
+
+  Future<void> _makeCall(String phone) async {
+    final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  Future<void> _sendSms(String phone) async {
+    final uri = Uri.parse('sms:$phone');
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  Future<void> _openKakao(String kakaoUrl) async {
+    final uri = Uri.parse(kakaoUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar(
+        '오픈채팅',
+        '카카오톡이 설치되어 있지 않아요.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   Widget _addressRow(bool isEditing) {
