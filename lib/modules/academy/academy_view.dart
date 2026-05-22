@@ -6,6 +6,7 @@ import '../home/home_view.dart';
 import 'academy_controller.dart';
 import '../home/home_controller.dart';
 import 'academy_detail_view.dart';
+import '../auth/login_view.dart';
 
 class AcademyView extends StatelessWidget {
   const AcademyView({super.key});
@@ -33,18 +34,34 @@ class AcademyView extends StatelessWidget {
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
         actions: [
+          // 기존 로그아웃 버튼
           TextButton(
             onPressed: () async {
               await AuthService.signOut();
-              Get.offAll(() => HomeView());
+              Get.offAll(() => const LoginView());
             },
             child: const Text(
               'Log-out',
-              style: TextStyle(
-                color: AppColors.darkPurple,
-                fontWeight: FontWeight.w900,
-              ),
+              style: TextStyle(color: AppColors.darkPurple),
             ),
+          ),
+          // [추가] 탈퇴 버튼
+          TextButton(
+            onPressed: () {
+              Get.defaultDialog(
+                title: '회원 탈퇴',
+                middleText: '탈퇴 시 모든 데이터가 삭제됩니다. 정말 탈퇴하시겠습니까?',
+                textConfirm: '탈퇴',
+                textCancel: '취소',
+                confirmTextColor: Colors.white,
+                buttonColor: Colors.red,
+                onConfirm: () async {
+                  await AuthService.deleteAccount();
+                  Get.offAll(() => const LoginView());
+                },
+              );
+            },
+            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

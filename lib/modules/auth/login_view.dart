@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../academy/academy_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -59,6 +60,26 @@ class LoginView extends StatelessWidget {
                 }
               },
               child: Image.asset('assets/images/kakao_login.png', width: 200),
+            ),
+            const SizedBox(height: 50), // 버튼들과의 간격
+            TextButton(
+              onPressed: () async {
+                // 우리가 방금 업데이트한 구글 사이트 주소
+                final Uri url = Uri.parse(
+                  'https://sites.google.com/view/larapapa/홈',
+                );
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: const Text(
+                '개인정보처리방침',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  decoration: TextDecoration.underline, // 링크처럼 보이게 밑줄
+                ),
+              ),
             ),
           ],
         ),
