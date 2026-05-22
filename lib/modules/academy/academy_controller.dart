@@ -70,7 +70,8 @@ class AcademyController extends GetxController {
     final data = await _supabase
         .from('academy_info')
         .select()
-        .eq('user_id', _supabase.auth.currentUser!.id);
+        .eq('user_id', _supabase.auth.currentUser!.id)
+        .order('created_at', ascending: true); // ✅ 생성순 정렬
     academyList.assignAll(data);
     isLoading.value = false;
   }

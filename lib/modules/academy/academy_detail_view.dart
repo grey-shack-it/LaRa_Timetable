@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import 'academy_controller.dart';
+import 'dart:convert';
+import 'kakao_address_search.dart';
 
 class AcademyDetailView extends StatefulWidget {
   final Map<String, dynamic> academy;
@@ -22,6 +24,7 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
   late final TextEditingController feeCtrl;
   late final TextEditingController memoCtrl;
   late final TextEditingController cycleCustomCtrl;
+  late final TextEditingController addressDetailCtrl;
   late final RxString selectedCycle;
   late final RxInt paymentDay;
   late final RxBool paymentAlarm;
@@ -49,6 +52,9 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
     cycleCustomCtrl = TextEditingController(
       text: widget.academy['payment_cycle_custom'] ?? '',
     );
+    addressDetailCtrl = TextEditingController(
+      text: widget.academy['address_detail'] ?? '',
+    );
     selectedCycle = RxString(widget.academy['payment_cycle'] ?? '매월');
     paymentDay = RxInt(widget.academy['payment_day'] ?? 1);
     paymentAlarm = RxBool(widget.academy['payment_alarm'] ?? false);
@@ -65,6 +71,7 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
     feeCtrl.dispose();
     memoCtrl.dispose();
     cycleCustomCtrl.dispose();
+    addressDetailCtrl.dispose();
     super.dispose();
   }
 
@@ -108,6 +115,12 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                       'payment_alarm': paymentAlarm.value,
                       'payment_alarm_days': paymentAlarmDays.value,
                       'memo': memoCtrl.text,
+                      'address_full': widget.academy['address_full'], // ✅ 추가
+                      'address_sido': widget.academy['address_sido'], // ✅ 추가
+                      'address_sigungu':
+                          widget.academy['address_sigungu'], // ✅ 추가
+                      'address_dong': widget.academy['address_dong'], // ✅ 추가
+                      'address_detail': addressDetailCtrl.text, // ✅ 추가
                     });
                     Get.back();
                   } else {
@@ -125,6 +138,11 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                       'payment_alarm': paymentAlarm.value,
                       'payment_alarm_days': paymentAlarmDays.value,
                       'memo': memoCtrl.text,
+                      'address_full': widget.academy['address_full'],
+                      'address_sido': widget.academy['address_sido'],
+                      'address_sigungu': widget.academy['address_sigungu'],
+                      'address_dong': widget.academy['address_dong'],
+                      'address_detail': addressDetailCtrl.text,
                     });
                     isEditing.value = false;
                   }
@@ -157,6 +175,7 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                   _fieldRow('학원명', nameCtrl, isEditing.value),
                   _fieldRow('과목', subjectCtrl, isEditing.value),
                   _addressRow(isEditing.value),
+                  _fieldRow('상세주소', addressDetailCtrl, isEditing.value),
                 ],
               ),
               const SizedBox(height: 12),
@@ -531,8 +550,20 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
           Expanded(
             child: isEditing
                 ? GestureDetector(
-                    onTap: () {
-                      // 카카오 주소 검색 (추후 구현)
+                    onTap: () async {
+                      final result = await Get.to(
+                        () => const KakaoAddressSearch(),
+                      );
+                      if (result != null) {
+                        final data = jsonDecode(result);
+                        setState(() {
+                          widget.academy['address_full'] = data['address_full'];
+                          widget.academy['address_sido'] = data['address_sido'];
+                          widget.academy['address_sigungu'] =
+                              data['address_sigungu'];
+                          widget.academy['address_dong'] = data['address_dong'];
+                        });
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
