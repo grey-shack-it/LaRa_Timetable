@@ -4,6 +4,7 @@ import '../../constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../academy/academy_view.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../home/home_view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -37,14 +38,14 @@ class LoginView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              '간편한 로그인으로 학원 정보를 관리하세요',
+              '간편한 로그인으로 아이들 학원 정보를 관리하세요',
               style: TextStyle(fontSize: 16, color: AppColors.darkPurple),
             ),
             const SizedBox(height: 60),
             GestureDetector(
               onTap: () async {
                 await AuthService.signInWithGoogle();
-                // 로그인 성공하면 홈으로 이동
+                // 로그인 성공하면 학원정보 화면으로 이동
                 if (AuthService.currentUser != null) {
                   Get.offAll(() => const AcademyView());
                 }
@@ -61,10 +62,26 @@ class LoginView extends StatelessWidget {
               },
               child: Image.asset('assets/images/kakao_login.png', width: 200),
             ),
+            const SizedBox(height: 24), // 로그인 버튼들과의 간격 조절
+            //  [추가] 로그인 없이 사용하기 버튼
+            TextButton(
+              onPressed: () {
+                Get.offAll(() => const HomeView());
+              },
+              child: const Text(
+                '로그인 없이 시간표 사용하기',
+                style: TextStyle(
+                  color: Colors.grey, // 너무 튀지 않게 차분한 회색조 추천
+                  fontSize: 18,
+                  decoration: TextDecoration.underline, // 밑줄을 그어 버튼임을 인지시킴
+                ),
+              ),
+            ),
+
             const SizedBox(height: 50), // 버튼들과의 간격
             TextButton(
               onPressed: () async {
-                // 우리가 방금 업데이트한 구글 사이트 주소
+                // 개인정보처리방침 링크(구글 사이트로 연결)
                 final Uri url = Uri.parse(
                   'https://sites.google.com/view/larapapa/홈',
                 );
