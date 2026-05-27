@@ -42,6 +42,7 @@ class AcademyController extends GetxController {
     }).toList();
 
     for (var s in unique) {
+      if (s.title.trim().isEmpty) continue;
       final existing = await _supabase
           .from('academy_info')
           .select()

@@ -107,6 +107,16 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
             () => TextButton(
               onPressed: () async {
                 if (isEditing.value) {
+                  if (nameCtrl.text.trim().isEmpty) {
+                    Get.snackbar(
+                      '입력 오류',
+                      '학원명을 입력해주세요.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: const Color.fromARGB(255, 146, 1, 182),
+                      colorText: Colors.white,
+                    );
+                    return;
+                  }
                   if (widget.academy['id'] == null) {
                     // 새로 추가
                     await controller.insertAcademy({
@@ -497,7 +507,7 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                       enabled: isEditing.value,
                       maxLines: isEditing.value ? 4 : null,
                       decoration: InputDecoration(
-                        hintText: '레벨테스트, 상담 내용 등',
+                        hintText: '상담 내용, 레벨테스트 내용 등\n자유롭게 메모해보세요!',
                         border: isEditing.value
                             ? const OutlineInputBorder()
                             : InputBorder.none,
@@ -535,7 +545,12 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                                       child: const Text(
                                         '삭제',
                                         style: TextStyle(
-                                          color: Colors.redAccent,
+                                          color: Color.fromARGB(
+                                            255,
+                                            243,
+                                            19,
+                                            124,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -545,7 +560,7 @@ class _AcademyDetailViewState extends State<AcademyDetailView> {
                             },
                             icon: const Icon(
                               Icons.delete_sweep,
-                              color: Colors.redAccent,
+                              color: Color.fromARGB(255, 243, 19, 124),
                               size: 32,
                             ),
                           ),

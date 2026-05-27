@@ -54,14 +54,17 @@ class AcademyView extends StatelessWidget {
                 textConfirm: '탈퇴',
                 textCancel: '취소',
                 confirmTextColor: Colors.white,
-                buttonColor: Colors.red,
+                buttonColor: Color.fromARGB(255, 243, 19, 124),
                 onConfirm: () async {
                   await AuthService.deleteAccount();
                   Get.offAll(() => const HomeView());
                 },
               );
             },
-            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              '탈퇴',
+              style: TextStyle(color: Color.fromARGB(255, 243, 19, 124)),
+            ),
           ),
         ],
       ),
