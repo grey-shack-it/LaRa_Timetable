@@ -93,4 +93,10 @@ class AcademyController extends GetxController {
     await _supabase.from('academy_info').delete().eq('id', id);
     await loadAcademyList();
   }
+
+  // 아이 이름 가져오기
+  String getChildName(String childId) {
+    final homeController = Get.find<HomeController>();
+    return homeController.getProfileName(childId);
+  }
 }

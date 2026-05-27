@@ -219,75 +219,35 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                       ),
                                     ),
-                                    child: Builder(
-                                      builder: (dropContext) {
-                                        return DragTarget<Schedule>(
-                                          onWillAcceptWithDetails: (details) =>
-                                              true,
-                                          onAcceptWithDetails: (details) {
-                                            final RenderBox box =
-                                                dropContext.findRenderObject()
-                                                    as RenderBox;
-                                            final Offset localOffset = box
-                                                .globalToLocal(details.offset);
-                                            double adjustedY =
-                                                localOffset.dy + (start * 60.0);
-                                            controller.updateScheduleTime(
-                                              details.data,
-                                              dayNum,
-                                              adjustedY,
-                                            );
-                                          },
-                                          builder:
-                                              (
-                                                context,
-                                                candidateData,
-                                                rejectedData,
-                                              ) {
-                                                return SizedBox(
-                                                  height: totalHours * 60.0,
-                                                  child: Stack(
-                                                    children: [
-                                                      GridLines(
-                                                        hours: totalHours,
+                                    child: SizedBox(
+                                      height: totalHours * 60.0,
+                                      child: Stack(
+                                        children: [
+                                          GridLines(hours: totalHours),
+                                          ...controller.displaySchedules
+                                              .where(
+                                                (s) => s.dayOfWeek == dayNum,
+                                              )
+                                              .map(
+                                                (s) => ScheduleBlock(
+                                                  controller: controller,
+                                                  schedule: s,
+                                                  startHour: start,
+                                                  onTap: () =>
+                                                      EditScheduleDialog.showEditOrDelete(
+                                                        context,
+                                                        controller,
+                                                        s,
                                                       ),
-                                                      ...controller
-                                                          .displaySchedules
-                                                          .where(
-                                                            (s) =>
-                                                                s.dayOfWeek ==
-                                                                dayNum,
-                                                          )
-                                                          .map(
-                                                            (
-                                                              s,
-                                                            ) => ScheduleBlock(
-                                                              controller:
-                                                                  controller,
-                                                              schedule: s,
-                                                              startHour: start,
-                                                              onTap: () =>
-                                                                  EditScheduleDialog.showEditOrDelete(
-                                                                    context,
-                                                                    controller,
-                                                                    s,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                      if (dayNum ==
-                                                          DateTime.now()
-                                                              .weekday)
-                                                        CurrentTimeLine(
-                                                          controller:
-                                                              controller,
-                                                          startHour: start,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                        );
-                                      },
+                                                ),
+                                              ),
+                                          if (dayNum == DateTime.now().weekday)
+                                            CurrentTimeLine(
+                                              controller: controller,
+                                              startHour: start,
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );

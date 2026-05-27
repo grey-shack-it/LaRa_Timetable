@@ -22,9 +22,8 @@ class AlarmService {
       '@mipmap/ic_launcher',
     );
     const initSettings = InitializationSettings(android: androidSettings);
-    await _notifications.initialize(initSettings);
+    await _notifications.initialize(settings: initSettings);
 
-    // 일반 알림 권한 (Android 13 이상) — 앱 시작 시 요청 유지
     try {
       await _notifications
           .resolvePlatformSpecificImplementation<
@@ -48,11 +47,11 @@ class AlarmService {
     if (!_initialized) await init();
     try {
       await _notifications.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledTime, tz.local),
-        const NotificationDetails(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(scheduledTime, tz.local),
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'schedule_alarm',
             '일정 알림',
@@ -64,8 +63,6 @@ class AlarmService {
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
       debugPrint('알람 예약 중 오류: $e');
@@ -75,19 +72,16 @@ class AlarmService {
   // 알람 취소
   static Future<void> cancelAlarm(int id) async {
     if (!_initialized) await init();
-    await _notifications.cancel(id);
+    await _notifications.cancel(id: id);
   }
 
   // 일정의 알람 전체 등록
   static Future<void> registerScheduleAlarms(Schedule schedule) async {
     if (schedule.key == null) return;
 
-    // 기존 알람 먼저 취소
     await cancelScheduleAlarms(schedule);
 
     final now = DateTime.now();
-
-    // 아이 이름 가져오기
     final controller = Get.find<HomeController>();
     final childName = controller.getProfileName(schedule.childId);
 
@@ -138,7 +132,7 @@ class AlarmService {
     await cancelAlarm(key * 10 + 2);
   }
 
-  // 다음 해당 요일 DateTime 계산 (dayOfWeek: 1=월 ~ 7=일)
+  // 다음 해당 요일 DateTime 계산
   static DateTime _nextWeekday(int dayOfWeek, int hour, int minute) {
     final now = DateTime.now();
     int daysUntil = dayOfWeek - now.weekday;
@@ -155,5 +149,71 @@ class AlarmService {
       hour,
       minute,
     );
+  }
+
+  // 결제일 알림 등록
+  static Future<void> schedulePaymentAlarm({
+    required String academyId,
+    required String academyName,
+    required String childName,
+    required int paymentDay,
+    required int alarmDaysBefore,
+    required int alarmHour,
+    required int alarmMinute,
+  }) async {
+    if (!_initialized) await init();
+
+    final now = DateTime.now();
+    int targetDay = paymentDay - alarmDaysBefore;
+    if (targetDay < 1) targetDay = 1;
+
+    DateTime scheduledDate = DateTime(
+      now.year,
+      now.month,
+      targetDay,
+      alarmHour,
+      alarmMinute,
+    );
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = DateTime(
+        now.year,
+        now.month + 1,
+        targetDay,
+        alarmHour,
+        alarmMinute,
+      );
+    }
+
+    final int notifId = academyId.hashCode.abs();
+
+    try {
+      await _notifications.zonedSchedule(
+        id: notifId,
+        title: '💰 학원비 결제일 알려드려요!',
+        body: '$alarmDaysBefore일 후 $childName의 $academyName 학원비 납부 잊지마세요!',
+        scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'payment_alarm',
+            '결제일 알림',
+            channelDescription: '학원 결제일 알림',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: '@mipmap/launcher_icon',
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+      );
+      debugPrint('결제일 알림 등록: $academyName / $scheduledDate');
+    } catch (e) {
+      debugPrint('결제일 알림 예약 오류: $e');
+    }
+  }
+
+  // 결제일 알림 취소
+  static Future<void> cancelPaymentAlarm(String academyId) async {
+    if (!_initialized) await init();
+    await _notifications.cancel(id: academyId.hashCode.abs());
   }
 }

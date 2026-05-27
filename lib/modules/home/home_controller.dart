@@ -204,22 +204,6 @@ class HomeController extends GetxController {
     loadSchedules();
   }
 
-  void updateScheduleTime(Schedule schedule, int day, double localY) {
-    int totalMinutes = localY.toInt();
-    int hour = totalMinutes ~/ 60;
-    int minute = (totalMinutes % 60) ~/ 10 * 10;
-
-    final duration = schedule.endTime.difference(schedule.startTime);
-
-    schedule.dayOfWeek = day;
-    schedule.startTime = DateTime(2024, 1, 1, hour.clamp(0, 23), minute);
-    schedule.endTime = schedule.startTime.add(duration);
-
-    schedule.save().then((_) {
-      refreshUI();
-    });
-  }
-
   bool hasOverlap(
     int day,
     DateTime start,
