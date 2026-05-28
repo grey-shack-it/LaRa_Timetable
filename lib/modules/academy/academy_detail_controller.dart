@@ -20,6 +20,7 @@ class AcademyDetailController extends GetxController {
   late final TextEditingController feeCtrl;
   late final TextEditingController memoCtrl;
   late final TextEditingController addressDetailCtrl;
+  late final RxString addressFull;
 
   // 결제 관련 상태
   late final RxString selectedCycle;
@@ -41,16 +42,23 @@ class AcademyDetailController extends GetxController {
     nameCtrl = TextEditingController(text: academy['name'] ?? '');
     subjectCtrl = TextEditingController(text: academy['subject'] ?? '');
     phoneCtrl = TextEditingController(text: academy['phone'] ?? '');
-    kakaoOpenchatCtrl = TextEditingController(text: academy['kakao_openchat'] ?? '');
+    kakaoOpenchatCtrl = TextEditingController(
+      text: academy['kakao_openchat'] ?? '',
+    );
     websiteCtrl = TextEditingController(text: academy['website'] ?? '');
-    shuttleCtrl = TextEditingController(text: academy['shuttle_location'] ?? '');
+    shuttleCtrl = TextEditingController(
+      text: academy['shuttle_location'] ?? '',
+    );
     feeCtrl = TextEditingController(
       text: academy['fee'] != null && academy['fee'] != 0
           ? academy['fee'].toString()
           : '',
     );
     memoCtrl = TextEditingController(text: academy['memo'] ?? '');
-    addressDetailCtrl = TextEditingController(text: academy['address_detail'] ?? '');
+    addressFull = RxString(academy['address_full'] ?? '');
+    addressDetailCtrl = TextEditingController(
+      text: academy['address_detail'] ?? '',
+    );
     selectedCycle = RxString(academy['payment_cycle'] ?? '월간');
     paymentStartMonth = RxInt(academy['payment_start_month'] ?? 1);
     paymentDay = RxInt(academy['payment_day'] ?? 1);
@@ -111,6 +119,7 @@ class AcademyDetailController extends GetxController {
         alarmDaysBefore: paymentAlarmDays.value,
         alarmHour: paymentAlarmHour.value,
         alarmMinute: paymentAlarmMinute.value,
+        paymentCycle: selectedCycle.value,
       );
     } else {
       await AlarmService.cancelPaymentAlarm(academyId);

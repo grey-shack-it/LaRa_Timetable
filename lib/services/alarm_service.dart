@@ -160,6 +160,7 @@ class AlarmService {
     required int alarmDaysBefore,
     required int alarmHour,
     required int alarmMinute,
+    String paymentCycle = '월간',
   }) async {
     if (!_initialized) await init();
 
@@ -203,7 +204,9 @@ class AlarmService {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+        matchDateTimeComponents: paymentCycle == '주간'
+            ? DateTimeComponents.dayOfWeekAndTime
+            : DateTimeComponents.dayOfMonthAndTime,
       );
       debugPrint('결제일 알림 등록: $academyName / $scheduledDate');
     } catch (e) {

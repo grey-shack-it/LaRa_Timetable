@@ -92,55 +92,66 @@ class AcademyDetailSections {
   static Widget addressRow(
     bool isEditing,
     Map<String, dynamic> academy,
+    RxString addressFull,
     Function(Map<String, dynamic>) onAddressChanged,
   ) {
-    final address = academy['address_full'];
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          const SizedBox(
-            width: 80,
-            child: Text(
-              '주소',
-              style: TextStyle(
-                color: AppColors.darkPurple,
-                fontWeight: FontWeight.w600,
+    return Obx(() {
+      final address = addressFull.value.isEmpty ? null : addressFull.value;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 80,
+              child: Text(
+                '주소',
+                style: TextStyle(
+                  color: AppColors.darkPurple,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: isEditing
-                ? GestureDetector(
-                    onTap: () async {
-                      final result = await Get.to(() => const KakaoAddressSearch());
-                      if (result != null) {
-                        final data = jsonDecode(result);
-                        onAddressChanged(data);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        address ?? '주소를 검색해주세요',
-                        style: TextStyle(
-                          color: address != null ? AppColors.darkPurple : Colors.grey,
+            Expanded(
+              child: isEditing
+                  ? GestureDetector(
+                      onTap: () async {
+                        final result = await Get.to(
+                          () => const KakaoAddressSearch(),
+                        );
+                        if (result != null) {
+                          final data = jsonDecode(result);
+                          onAddressChanged(data);
+                          addressFull.value = data['address_full'] ?? '';
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          address ?? '주소를 검색해주세요',
+                          style: TextStyle(
+                            color: address != null
+                                ? AppColors.darkPurple
+                                : Colors.grey,
+                          ),
                         ),
                       ),
+                    )
+                  : Text(
+                      address ?? '-',
+                      style: const TextStyle(color: AppColors.darkPurple),
                     ),
-                  )
-                : Text(
-                    address ?? '-',
-                    style: const TextStyle(color: AppColors.darkPurple),
-                  ),
-          ),
-        ],
-      ),
-    );
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   // 학원비 행
@@ -153,7 +164,10 @@ class AcademyDetailSections {
             width: 80,
             child: Text(
               '학원비',
-              style: TextStyle(color: AppColors.darkPurple, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.darkPurple,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           Expanded(
@@ -194,7 +208,10 @@ class AcademyDetailSections {
                 width: 80,
                 child: Text(
                   '전화번호',
-                  style: TextStyle(color: AppColors.darkPurple, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.darkPurple,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Expanded(
@@ -215,14 +232,22 @@ class AcademyDetailSections {
               if (!isEditing && ctrl.phoneCtrl.text.isNotEmpty) ...[
                 IconButton(
                   onPressed: () => _makeCall(ctrl.phoneCtrl.text),
-                  icon: const Icon(Icons.call, color: AppColors.mainPurple, size: 20),
+                  icon: const Icon(
+                    Icons.call,
+                    color: AppColors.mainPurple,
+                    size: 20,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => _sendSms(ctrl.phoneCtrl.text),
-                  icon: const Icon(Icons.sms, color: AppColors.mainPurple, size: 20),
+                  icon: const Icon(
+                    Icons.sms,
+                    color: AppColors.mainPurple,
+                    size: 20,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -240,7 +265,10 @@ class AcademyDetailSections {
                 width: 80,
                 child: Text(
                   '오픈채팅',
-                  style: TextStyle(color: AppColors.darkPurple, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.darkPurple,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Expanded(
@@ -253,7 +281,9 @@ class AcademyDetailSections {
                         ),
                       )
                     : Text(
-                        ctrl.kakaoOpenchatCtrl.text.isEmpty ? '-' : ctrl.kakaoOpenchatCtrl.text,
+                        ctrl.kakaoOpenchatCtrl.text.isEmpty
+                            ? '-'
+                            : ctrl.kakaoOpenchatCtrl.text,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: AppColors.darkPurple),
                       ),
@@ -261,7 +291,11 @@ class AcademyDetailSections {
               if (!isEditing && ctrl.kakaoOpenchatCtrl.text.isNotEmpty)
                 IconButton(
                   onPressed: () => _openKakao(ctrl.kakaoOpenchatCtrl.text),
-                  icon: Image.asset('assets/images/kakao_icon.png', width: 24, height: 24),
+                  icon: Image.asset(
+                    'assets/images/kakao_icon.png',
+                    width: 24,
+                    height: 24,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -278,7 +312,10 @@ class AcademyDetailSections {
                 width: 80,
                 child: Text(
                   '웹사이트',
-                  style: TextStyle(color: AppColors.darkPurple, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.darkPurple,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Expanded(
@@ -291,7 +328,9 @@ class AcademyDetailSections {
                         ),
                       )
                     : Text(
-                        ctrl.websiteCtrl.text.isEmpty ? '-' : ctrl.websiteCtrl.text,
+                        ctrl.websiteCtrl.text.isEmpty
+                            ? '-'
+                            : ctrl.websiteCtrl.text,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: AppColors.darkPurple),
                       ),
@@ -299,7 +338,11 @@ class AcademyDetailSections {
               if (!isEditing && ctrl.websiteCtrl.text.isNotEmpty)
                 IconButton(
                   onPressed: () => _openWebsite(ctrl.websiteCtrl.text),
-                  icon: const Icon(Icons.language, color: AppColors.mainPurple, size: 20),
+                  icon: const Icon(
+                    Icons.language,
+                    color: AppColors.mainPurple,
+                    size: 20,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -328,8 +371,11 @@ class AcademyDetailSections {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('오픈채팅', '카카오톡이 설치되어 있지 않아요.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        '오픈채팅',
+        '카카오톡이 설치되어 있지 않아요.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -343,8 +389,11 @@ class AcademyDetailSections {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('알림', '웹사이트를 열 수 없습니다. 주소를 확인해 주세요.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        '알림',
+        '웹사이트를 열 수 없습니다. 주소를 확인해 주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
