@@ -70,12 +70,31 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
-        leading: IconButton(
-          iconSize: 38,
-          icon: const Icon(Icons.image, color: AppColors.darkPurple),
-          onPressed: () =>
-              ImageSaveService.saveTimeTable(screenshotController, controller),
+        // 1. 왼쪽(leading)에 로그인 버튼(앱 아이콘) 배치
+        leading: Center(
+          // Center로 감싸서 좌측 패딩 정렬을 예쁘게 잡아줍니다.
+          child: GestureDetector(
+            onTap: () {
+              if (AuthService.currentUser != null) {
+                Get.delete<AcademyController>(force: true);
+                Get.off(() => const AcademyView());
+              } else {
+                Get.to(() => const LoginView());
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/app_icon.png',
+                width: 38,
+                height: 38,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ),
+
+        // 2. 가운데 제목 (기존 유지)
         title: Obx(() {
           final title = controller.isOverlapView.value
               ? '아이들 시간표'
@@ -91,29 +110,18 @@ class _HomeViewState extends State<HomeView> {
         centerTitle: true,
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
+
+        // 3. 오른쪽(actions)에 이미지 저장 버튼 배치
         actions: [
-          GestureDetector(
-            onTap: () {
-              if (AuthService.currentUser != null) {
-                Get.delete<AcademyController>(force: true);
-                Get.off(() => const AcademyView());
-              } else {
-                Get.to(() => const LoginView());
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/images/app_icon.png',
-                  width: 38,
-                  height: 38,
-                  fit: BoxFit.cover,
-                ),
-              ),
+          IconButton(
+            iconSize: 36,
+            icon: const Icon(Icons.image, color: AppColors.darkPurple),
+            onPressed: () => ImageSaveService.saveTimeTable(
+              screenshotController,
+              controller,
             ),
           ),
+          const SizedBox(width: 4), // 우측 여백 살짝 주기
         ],
       ),
 
