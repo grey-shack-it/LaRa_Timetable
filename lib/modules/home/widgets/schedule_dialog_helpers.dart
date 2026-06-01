@@ -45,47 +45,50 @@ Widget buildAcademyIcon(String name, {required double size}) {
 void showScheduleTimePicker(DateTime current, Function(DateTime) onSelected) {
   final tempTime = current.obs;
   Get.bottomSheet(
-    Container(
-      height: 300,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            '시간 선택',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: AppColors.darkPurple,
-            ),
-          ),
-          Expanded(
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.time,
-              initialDateTime: current,
-              use24hFormat: true,
-              minuteInterval: 5,
-              onDateTimeChanged: (d) => tempTime.value = d,
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              onSelected(tempTime.value);
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mainPurple,
-              minimumSize: const Size(double.infinity, 48),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+    SafeArea(
+      child: Container(
+        height: 300,
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          children: [
+            const Text(
+              '시간 선택',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkPurple,
               ),
             ),
-            child: const Text('확인', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.time,
+                initialDateTime: current,
+                use24hFormat: true,
+                minuteInterval: 5,
+                onDateTimeChanged: (d) => tempTime.value = d,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                onSelected(tempTime.value);
+                Get.back();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainPurple,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text('확인', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: MediaQuery.of(Get.context!).padding.bottom),
+          ],
+        ),
       ),
     ),
   );
@@ -114,55 +117,58 @@ void showAlarmMinutePicker(RxInt targetMinutes) {
   );
 
   Get.bottomSheet(
-    Container(
-      height: 250,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            '알림 시간 설정',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: AppColors.darkPurple,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: CupertinoPicker(
-              scrollController: fixedController,
-              itemExtent: 44,
-              onSelectedItemChanged: (index) {
-                targetMinutes.value = minuteOptions[index];
-              },
-              children: minuteOptions
-                  .map(
-                    (m) => Center(
-                      child: Text(
-                        '$m분 전',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Get.back(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mainPurple,
-              minimumSize: const Size(double.infinity, 48),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+    SafeArea(
+      child: Container(
+        height: 280,
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          children: [
+            const Text(
+              '알림 시간 설정',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkPurple,
               ),
             ),
-            child: const Text('확인', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+            Expanded(
+              child: CupertinoPicker(
+                scrollController: fixedController,
+                itemExtent: 44,
+                onSelectedItemChanged: (index) {
+                  targetMinutes.value = minuteOptions[index];
+                },
+                children: minuteOptions
+                    .map(
+                      (m) => Center(
+                        child: Text(
+                          '$m분 전',
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => Get.back(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainPurple,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text('확인', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: MediaQuery.of(Get.context!).padding.bottom),
+          ],
+        ),
       ),
     ),
   );

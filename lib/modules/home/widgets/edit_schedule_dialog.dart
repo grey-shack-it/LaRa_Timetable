@@ -410,7 +410,7 @@ class EditScheduleDialog {
                     ),
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+                SizedBox(height: MediaQuery.of(context).padding.bottom),
               ],
             ),
           ),
