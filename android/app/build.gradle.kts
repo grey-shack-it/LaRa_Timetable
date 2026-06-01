@@ -60,6 +60,7 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")  // ✅ 추가
+    implementation("androidx.core:core-ktx:1.12.0") // ✅ 추가
 }
 
 flutter {

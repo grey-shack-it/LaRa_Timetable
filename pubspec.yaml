@@ -16,7 +16,7 @@ description: "Children's schedule management app."
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.1.1+7 # 학원비 결제일 알림 추가/화면 짤림 개선 - 화면짤림 또 개선
+version: 1.1.1+8 # 화면짤림 또또 개선
 
 environment:
   sdk: ^3.10.4
