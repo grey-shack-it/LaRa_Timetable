@@ -13,6 +13,7 @@ import 'package:my_timeline_app/constants/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // 추가
 import 'env.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,17 @@ void main() async {
     debugPrint('AlarmService 초기화 오류: $e');
   }
   await MobileAds.instance.initialize();
+
+  // 인앱 업데이트 체크
+  try {
+    final updateInfo = await InAppUpdate.checkForUpdate();
+    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+      await InAppUpdate.startFlexibleUpdate();
+      await InAppUpdate.completeFlexibleUpdate();
+    }
+  } catch (e) {
+    debugPrint('인앱 업데이트 체크 오류: $e');
+  }
 
   FlutterNativeSplash.remove();
 

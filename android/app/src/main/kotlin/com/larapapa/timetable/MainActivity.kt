@@ -1,11 +1,11 @@
 package com.larapapa.timetable
 
 import io.flutter.embedding.android.FlutterActivity
-import androidx.core.view.WindowCompat
+import androidx.activity.enableEdgeToEdge
 
 class MainActivity : FlutterActivity() {
-    override fun onResume() {
-        super.onResume()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
     }
 }

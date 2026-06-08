@@ -5,23 +5,26 @@ import '../../../constants/app_colors.dart';
 import 'schedule_dialog_helpers.dart'; // ✅ 공통 헬퍼 import
 
 class AddScheduleDialog {
-  static void show(BuildContext context, HomeController controller) {
+  static void show(
+    BuildContext context,
+    HomeController controller, {
+    int? initialDay,
+    DateTime? initialStartTime,
+    DateTime? initialEndTime,
+  }) {
     final titleController = TextEditingController();
     final now = DateTime.now();
     final roundedMinute = ((now.minute / 10).ceil() * 10);
     final startHour = roundedMinute == 60 ? now.hour + 1 : now.hour;
     final startMinute = roundedMinute == 60 ? 0 : roundedMinute;
-    final startTime = DateTime(2024, 1, 1, startHour, startMinute).obs;
-    final endTime = DateTime(
-      2024,
-      1,
-      1,
-      startHour + 1,
-      startMinute,
-    ).obs; // ✅ now.hour+1 대신 startHour+1
+    final startTime =
+        (initialStartTime ?? DateTime(2024, 1, 1, startHour, startMinute)).obs;
+    final endTime =
+        (initialEndTime ?? DateTime(2024, 1, 1, startHour + 1, startMinute))
+            .obs;
+    final selectedDays = <int>{initialDay ?? _currentDayOfWeek()}.obs;
     final selectedIcon = academyImages.keys.first.obs;
     final selectedColor = pastelColors.first.obs;
-    final selectedDays = <int>{_currentDayOfWeek()}.obs;
     final startAlarm = false.obs;
     final startAlarmMinutes = 10.obs;
     final endAlarm = false.obs;

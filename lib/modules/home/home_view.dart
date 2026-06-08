@@ -227,34 +227,67 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                       ),
                                     ),
-                                    child: SizedBox(
-                                      height: totalHours * 60.0,
-                                      child: Stack(
-                                        children: [
-                                          GridLines(hours: totalHours),
-                                          ...controller.displaySchedules
-                                              .where(
-                                                (s) => s.dayOfWeek == dayNum,
-                                              )
-                                              .map(
-                                                (s) => ScheduleBlock(
-                                                  controller: controller,
-                                                  schedule: s,
-                                                  startHour: start,
-                                                  onTap: () =>
-                                                      EditScheduleDialog.showEditOrDelete(
-                                                        context,
-                                                        controller,
-                                                        s,
-                                                      ),
+                                    child: GestureDetector(
+                                      onLongPressStart: (details) {
+                                        final touchY = details.localPosition.dy;
+                                        final totalMinutes =
+                                            (touchY + start * 60).toInt();
+                                        final hour = (totalMinutes ~/ 60).clamp(
+                                          0,
+                                          23,
+                                        );
+                                        final minute =
+                                            ((totalMinutes % 60) ~/ 30) * 30;
+
+                                        final startTime = DateTime(
+                                          2024,
+                                          1,
+                                          1,
+                                          hour,
+                                          minute,
+                                        );
+                                        final endTime = startTime.add(
+                                          const Duration(hours: 1),
+                                        );
+
+                                        AddScheduleDialog.show(
+                                          context,
+                                          controller,
+                                          initialDay: dayNum,
+                                          initialStartTime: startTime,
+                                          initialEndTime: endTime,
+                                        );
+                                      },
+                                      child: SizedBox(
+                                        height: totalHours * 60.0,
+                                        child: Stack(
+                                          children: [
+                                            GridLines(hours: totalHours),
+                                            ...controller.displaySchedules
+                                                .where(
+                                                  (s) => s.dayOfWeek == dayNum,
+                                                )
+                                                .map(
+                                                  (s) => ScheduleBlock(
+                                                    controller: controller,
+                                                    schedule: s,
+                                                    startHour: start,
+                                                    onTap: () =>
+                                                        EditScheduleDialog.showEditOrDelete(
+                                                          context,
+                                                          controller,
+                                                          s,
+                                                        ),
+                                                  ),
                                                 ),
+                                            if (dayNum ==
+                                                DateTime.now().weekday)
+                                              CurrentTimeLine(
+                                                controller: controller,
+                                                startHour: start,
                                               ),
-                                          if (dayNum == DateTime.now().weekday)
-                                            CurrentTimeLine(
-                                              controller: controller,
-                                              startHour: start,
-                                            ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
