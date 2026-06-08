@@ -6,12 +6,10 @@ import 'package:screenshot/screenshot.dart';
 import 'package:my_timeline_app/constants/app_colors.dart';
 import '../../services/image_save_service.dart';
 import 'widgets/profile_tab_bar.dart';
-import 'widgets/profile_manage_sheet.dart';
 import 'widgets/schedule_block.dart';
 import 'widgets/add_schedule_dialog.dart';
 import 'widgets/edit_schedule_dialog.dart';
 import 'widgets/time_grid.dart';
-import '../../data/schedule.dart';
 import 'package:flutter/foundation.dart';
 import '../auth/login_view.dart';
 import '../academy/academy_view.dart';
@@ -172,7 +170,7 @@ class _HomeViewState extends State<HomeView> {
                       child: SingleChildScrollView(
                         child: Obx(() {
                           final _ = controller.selectedChildId.value;
-                          final __ = controller.schedules.length;
+                          final _ = controller.schedules.length;
                           int start = controller.startHour.value;
                           int end = controller.endHour.value;
                           int totalHours = end - start + 1;

@@ -8,27 +8,29 @@ import 'package:flutter/material.dart';
 class AuthService {
   static final _supabase = Supabase.instance.client;
 
-  static final _googleSignIn = GoogleSignIn(
-    clientId: Env.googleAndroidClientId,
-    serverClientId: Env.googleWebClientId,
-  );
-
+  // 구글 로그인
   static Future<void> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) return;
+    try {
+      await GoogleSignIn.instance.initialize(
+        clientId: Env.googleAndroidClientId,
+        serverClientId: Env.googleWebClientId,
+      );
 
-    final googleAuth = await googleUser.authentication;
+      final googleUser = await GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
 
-    await _supabase.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: googleAuth.idToken!,
-      accessToken: googleAuth.accessToken,
-    );
+      await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: googleAuth.idToken!,
+        accessToken: googleAuth.idToken,
+      );
 
-    // ✅ 로그인 후 profiles에 없으면 자동 추가
-    final user = _supabase.auth.currentUser;
-    if (user != null) {
-      await _supabase.from('profiles').upsert({'id': user.id});
+      final user = _supabase.auth.currentUser;
+      if (user != null) {
+        await _supabase.from('profiles').upsert({'id': user.id});
+      }
+    } catch (e) {
+      debugPrint('구글 로그인 오류: $e');
     }
   }
 
@@ -62,7 +64,7 @@ class AuthService {
   }
 
   static Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    await GoogleSignIn.instance.disconnect();
     await _supabase.auth.signOut();
   }
 

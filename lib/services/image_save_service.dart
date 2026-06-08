@@ -35,7 +35,7 @@ class ImageSaveService {
       final result = await SaverGallery.saveFile(
         filePath: finalImage,
         fileName: 'larapapa_${DateTime.now().millisecondsSinceEpoch}',
-        androidRelativePath: 'Pictures/라라 시간표',
+        albumPath: 'Pictures/라라 시간표',
         skipIfExists: false,
       );
 
