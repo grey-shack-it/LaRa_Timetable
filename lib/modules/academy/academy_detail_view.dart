@@ -213,7 +213,7 @@ class AcademyDetailView extends StatelessWidget {
                                 child: const Text(
                                   '삭제',
                                   style: TextStyle(
-                                    color: Color.fromARGB(255, 243, 19, 124),
+                                    color: Color.fromARGB(255, 205, 104, 230),
                                   ),
                                 ),
                               ),
@@ -223,7 +223,7 @@ class AcademyDetailView extends StatelessWidget {
                       },
                       icon: const Icon(
                         Icons.delete_sweep,
-                        color: Color.fromARGB(255, 243, 19, 124),
+                        color: Color.fromARGB(255, 205, 104, 230),
                         size: 32,
                       ),
                     ),

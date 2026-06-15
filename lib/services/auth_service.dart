@@ -19,12 +19,12 @@ class AuthService {
       final googleUser = await GoogleSignIn.instance.authenticate();
       final googleAuth = googleUser.authentication;
 
+      print('🔑 idToken: ${googleAuth.idToken}');
+
       await _supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: googleAuth.idToken!,
-        accessToken: googleAuth.idToken,
       );
-
       final user = _supabase.auth.currentUser;
       if (user != null) {
         await _supabase.from('profiles').upsert({'id': user.id});

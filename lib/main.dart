@@ -19,6 +19,8 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   KakaoSdk.init(nativeAppKey: Env.kakaoNativeAppKey);
+  final keyHash = await KakaoSdk.origin;
+  print('카카오 키 해시: $keyHash');
 
   // Supabase 초기화 추가
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);

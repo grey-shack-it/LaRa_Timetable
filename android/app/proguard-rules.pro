@@ -13,3 +13,17 @@
 # Flutter
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
+
+# Google Sign In
+-keep class com.google.android.gms.auth.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+
+# Supabase / OkHttp
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+# Kakao SDK
+-keep class com.kakao.** { *; }
+-dontwarn com.kakao.**
