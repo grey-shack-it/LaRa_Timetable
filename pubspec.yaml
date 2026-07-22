@@ -16,7 +16,7 @@ description: "Children's schedule management app."
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+3 #버그수정 (광고배너 위치 _ 팝업창 확인 버튼 위치 수정)
+version: 1.1.4+12 # 이미지 접근 권한 수정
 
 environment:
   sdk: ^3.10.4
@@ -30,25 +30,31 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+    
+  supabase_flutter: ^2.8.4
+  google_sign_in: ^7.2.0
+  kakao_flutter_sdk_user: ^1.9.5
+  webview_flutter: ^4.10.0
+  url_launcher: ^6.3.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   get: ^4.7.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  flutter_local_notifications: ^18.0.0  # ✅ 추가
-  timezone: ^0.9.4                       # ✅ 추가
-  google_mobile_ads: ^5.1.0  # ✅ 추가
-  device_info_plus: ^10.0.0  # ✅ 추가
+  flutter_local_notifications: ^22.0.0  # ✅ 추가
+  timezone: ^0.11.0                       # ✅ 추가
+  google_mobile_ads: ^8.0.0  # ✅ 추가
+  device_info_plus: ^13.1.0  # ✅ 추가
   screenshot: ^3.0.0        # ✅ 추가
-  saver_gallery: ^3.0.6     # ✅ 추가
+  saver_gallery: ^5.1.0     # ✅ 추가
   path_provider: ^2.1.0
+  in_app_update: ^4.2.3  # 업데이트 체크용 패키지 (인앱 업데이트 지원)  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
+  flutter_launcher_icons: ^0.14.4
   
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

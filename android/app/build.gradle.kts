@@ -8,8 +8,7 @@ keyProperties.load(FileInputStream(keyPropertiesFile))
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
+    id("dev.flutter.flutter-gradle-plugin")    
 }
 
 android {
@@ -61,6 +60,7 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")  // ✅ 추가
+    implementation("androidx.core:core-ktx:1.12.0") // ✅ 추가
 }
 
 flutter {

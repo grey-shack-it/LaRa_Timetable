@@ -6,13 +6,15 @@ import 'package:screenshot/screenshot.dart';
 import 'package:my_timeline_app/constants/app_colors.dart';
 import '../../services/image_save_service.dart';
 import 'widgets/profile_tab_bar.dart';
-import 'widgets/profile_manage_sheet.dart';
 import 'widgets/schedule_block.dart';
 import 'widgets/add_schedule_dialog.dart';
 import 'widgets/edit_schedule_dialog.dart';
 import 'widgets/time_grid.dart';
-import '../../data/schedule.dart';
 import 'package:flutter/foundation.dart';
+import '../auth/login_view.dart';
+import '../academy/academy_view.dart';
+import '../../services/auth_service.dart';
+import '../academy/academy_controller.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -66,11 +68,31 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: AppColors.lightPurple,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.image, color: AppColors.darkPurple),
-          onPressed: () =>
-              ImageSaveService.saveTimeTable(screenshotController, controller),
+        // 1. 왼쪽(leading)에 로그인 버튼(앱 아이콘) 배치
+        leading: Center(
+          // Center로 감싸서 좌측 패딩 정렬을 예쁘게 잡아줍니다.
+          child: GestureDetector(
+            onTap: () {
+              if (AuthService.currentUser != null) {
+                Get.delete<AcademyController>(force: true);
+                Get.off(() => const AcademyView());
+              } else {
+                Get.to(() => const LoginView());
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/app_icon.png',
+                width: 38,
+                height: 38,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ),
+
+        // 2. 가운데 제목 (기존 유지)
         title: Obx(() {
           final title = controller.isOverlapView.value
               ? '아이들 시간표'
@@ -86,11 +108,18 @@ class _HomeViewState extends State<HomeView> {
         centerTitle: true,
         backgroundColor: AppColors.lightPurple,
         elevation: 0,
+
+        // 3. 오른쪽(actions)에 이미지 저장 버튼 배치
         actions: [
           IconButton(
-            icon: const Icon(Icons.people, color: AppColors.darkPurple),
-            onPressed: () => ProfileManageSheet.show(context, controller),
+            iconSize: 36,
+            icon: const Icon(Icons.image, color: AppColors.darkPurple),
+            onPressed: () => ImageSaveService.saveTimeTable(
+              screenshotController,
+              controller,
+            ),
           ),
+          const SizedBox(width: 4), // 우측 여백 살짝 주기
         ],
       ),
 
@@ -141,7 +170,7 @@ class _HomeViewState extends State<HomeView> {
                       child: SingleChildScrollView(
                         child: Obx(() {
                           final _ = controller.selectedChildId.value;
-                          final __ = controller.schedules.length;
+                          final _ = controller.schedules.length;
                           int start = controller.startHour.value;
                           int end = controller.endHour.value;
                           int totalHours = end - start + 1;
@@ -196,75 +225,68 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                       ),
                                     ),
-                                    child: Builder(
-                                      builder: (dropContext) {
-                                        return DragTarget<Schedule>(
-                                          onWillAcceptWithDetails: (details) =>
-                                              true,
-                                          onAcceptWithDetails: (details) {
-                                            final RenderBox box =
-                                                dropContext.findRenderObject()
-                                                    as RenderBox;
-                                            final Offset localOffset = box
-                                                .globalToLocal(details.offset);
-                                            double adjustedY =
-                                                localOffset.dy + (start * 60.0);
-                                            controller.updateScheduleTime(
-                                              details.data,
-                                              dayNum,
-                                              adjustedY,
-                                            );
-                                          },
-                                          builder:
-                                              (
-                                                context,
-                                                candidateData,
-                                                rejectedData,
-                                              ) {
-                                                return SizedBox(
-                                                  height: totalHours * 60.0,
-                                                  child: Stack(
-                                                    children: [
-                                                      GridLines(
-                                                        hours: totalHours,
-                                                      ),
-                                                      ...controller
-                                                          .displaySchedules
-                                                          .where(
-                                                            (s) =>
-                                                                s.dayOfWeek ==
-                                                                dayNum,
-                                                          )
-                                                          .map(
-                                                            (
-                                                              s,
-                                                            ) => ScheduleBlock(
-                                                              controller:
-                                                                  controller,
-                                                              schedule: s,
-                                                              startHour: start,
-                                                              onTap: () =>
-                                                                  EditScheduleDialog.showEditOrDelete(
-                                                                    context,
-                                                                    controller,
-                                                                    s,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                      if (dayNum ==
-                                                          DateTime.now()
-                                                              .weekday)
-                                                        CurrentTimeLine(
-                                                          controller:
-                                                              controller,
-                                                          startHour: start,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
+                                    child: GestureDetector(
+                                      onLongPressStart: (details) {
+                                        final touchY = details.localPosition.dy;
+                                        final totalMinutes =
+                                            (touchY + start * 60).toInt();
+                                        final hour = (totalMinutes ~/ 60).clamp(
+                                          0,
+                                          23,
+                                        );
+                                        final minute =
+                                            ((totalMinutes % 60) ~/ 30) * 30;
+
+                                        final startTime = DateTime(
+                                          2024,
+                                          1,
+                                          1,
+                                          hour,
+                                          minute,
+                                        );
+                                        final endTime = startTime.add(
+                                          const Duration(hours: 1),
+                                        );
+
+                                        AddScheduleDialog.show(
+                                          context,
+                                          controller,
+                                          initialDay: dayNum,
+                                          initialStartTime: startTime,
+                                          initialEndTime: endTime,
                                         );
                                       },
+                                      child: SizedBox(
+                                        height: totalHours * 60.0,
+                                        child: Stack(
+                                          children: [
+                                            GridLines(hours: totalHours),
+                                            ...controller.displaySchedules
+                                                .where(
+                                                  (s) => s.dayOfWeek == dayNum,
+                                                )
+                                                .map(
+                                                  (s) => ScheduleBlock(
+                                                    controller: controller,
+                                                    schedule: s,
+                                                    startHour: start,
+                                                    onTap: () =>
+                                                        EditScheduleDialog.showEditOrDelete(
+                                                          context,
+                                                          controller,
+                                                          s,
+                                                        ),
+                                                  ),
+                                                ),
+                                            if (dayNum ==
+                                                DateTime.now().weekday)
+                                              CurrentTimeLine(
+                                                controller: controller,
+                                                startHour: start,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 );

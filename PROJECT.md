@@ -10,9 +10,8 @@
 다자녀 가정도 한 화면에서 모든 아이의 일정을 확인할 수 있다.
 
 - **플랫폼**: Android (iOS 추후 예정)
-- **버전**: 1.1.4+12
+- **버전**: 1.1.1+6
 - **패키지명**: `com.larapapa.timetable`
-- **배포 상태**: Google Play 프로덕션 승인 완료
 
 ---
 
@@ -40,32 +39,19 @@
 
 ## 버전 히스토리
 
-### v1.1.4+12 (현재 — 프로덕션 승인 완료)
-- READ_MEDIA_IMAGES 권한 삭제 (저장 전용이라 불필요, Google Play 정책 심사 대응)
-
-### v1.1.3
-- 구글/카카오 로그인 릴리즈 빌드 SHA-1/키 해시 정리 (Debug/Upload/Release 키 모두 등록)
-- 시간표 빈 곳 길게 누르면 일정 추가 (시간대 자동 계산)
-- 인앱 업데이트 적용 (in_app_update)
-- Android 10 삼성 기기 크래시 수정 (windowLayoutInDisplayCutoutMode 분기 처리)
-- 타임피커/일정 다이얼로그 하단 여백 SafeArea 적용
-- google_sign_in v7 / saver_gallery v5 API 변경 대응
-- kakao_flutter_sdk_user 1.9.5 고정 (2.0.0 업그레이드 시 크래시 발생)
-
-### v1.1.0~1.1.2
+### v1.1.0 (현재)
 - 구글 / 카카오 소셜 로그인
 - 학원 정보 관리 (추가/편집/삭제)
 - 카카오 주소 검색 API 연동
 - 전화 / 문자 / 오픈채팅 / 웹사이트 연동
 - 결제 주기 개편 (월간/주간/분기/반기/연간)
-- 결제일 알림 (시간 설정, 매월/매주 반복)
+- 결제일 알림 (시간 설정, 매월 반복)
 - 학원비 천단위 콤마 표시
 - 드래그 이동 기능 삭제 (UX 개선)
 - SafeArea 적용
 - Android 15 Edge-to-Edge 대응
 - 개인정보처리방침 링크
 - 회원 탈퇴 기능
-- academy_detail_view 리팩토링 (controller/sections/payment 분리)
 
 ### v1.0.x
 - 시간표 작성 / 다자녀 관리 / 이미지 저장 / 알림
@@ -83,7 +69,7 @@
 ## 장기 로드맵
 
 ```
-현재: 시간표 + 학원 정보 관리 (v1.1.4, 프로덕션 배포 완료)
+현재: 시간표 + 학원 정보 관리 (v1.1.0)
   ↓
 다음: 홈 화면 위젯 (v1.2.0)
   ↓
@@ -124,19 +110,15 @@
 |------|-----------|------|------|
 | 상태 관리 | GetX | ^4.7.3 | |
 | 로컬 DB | Hive | ^2.2.3 | 시간표 데이터 |
-| 서버 DB | Supabase | ^2.8.4 | 학원 정보, 로그인 |
-| 소셜 로그인 | google_sign_in | ^7.2.0 | API v7 (authenticate 방식) |
-| 소셜 로그인 | kakao_flutter_sdk_user | ^1.9.5 | **2.0.0 업그레이드 금지** (크래시) |
+| 서버 DB | Supabase | - | 학원 정보, 로그인 |
+| 소셜 로그인 | google_sign_in / kakao_flutter_sdk_user | - | 구글/카카오 |
 | 주소 검색 | 카카오 주소 검색 API (WebView) | - | |
-| 알림 | flutter_local_notifications | ^22.0.0 | |
+| 알림 | flutter_local_notifications | ^21.0.0 | |
 | 타임존 | timezone | ^0.11.0 | |
-| 광고 | google_mobile_ads | ^8.0.0 | |
-| 이미지 저장 | screenshot | ^3.0.0 | |
-| 이미지 저장 | saver_gallery | ^5.1.0 | albumPath 파라미터 (구 androidRelativePath) |
-| URL 연동 | url_launcher | ^6.3.1 | 전화/문자/웹 |
-| WebView | webview_flutter | ^4.10.0 | 주소 검색 |
-| 인앱 업데이트 | in_app_update | ^4.2.3 | 플레이스토어 배포본에서만 동작 |
-| 기기 정보 | device_info_plus | ^13.1.0 | |
+| 광고 | google_mobile_ads | - | |
+| 이미지 저장 | screenshot + saver_gallery | - | |
+| URL 연동 | url_launcher | - | 전화/문자/웹 |
+| WebView | webview_flutter | - | 주소 검색 |
 
 ---
 
@@ -157,13 +139,10 @@ lib/
 │   ├── auth/
 │   │   └── login_view.dart          # 로그인 화면
 │   ├── academy/
-│   │   ├── academy_controller.dart      # 학원정보 로직 (GetX)
-│   │   ├── academy_view.dart            # 학원정보 목록 화면
-│   │   ├── academy_detail_view.dart     # 학원 상세/편집 메인 화면
-│   │   ├── academy_detail_controller.dart # 학원 상세 상태 관리 (GetX)
-│   │   ├── academy_detail_sections.dart # 공통 섹션 위젯 (기본정보/연락처 등)
-│   │   ├── academy_detail_payment.dart  # 결제 관련 위젯
-│   │   └── kakao_address_search.dart    # 카카오 주소 검색
+│   │   ├── academy_controller.dart  # 학원정보 로직 (GetX)
+│   │   ├── academy_view.dart        # 학원정보 목록 화면
+│   │   ├── academy_detail_view.dart # 학원 상세/편집 화면
+│   │   └── kakao_address_search.dart # 카카오 주소 검색
 │   └── home/
 │       ├── home_controller.dart     # 앱 핵심 로직 (GetX)
 │       ├── home_view.dart           # 메인 화면
@@ -251,27 +230,18 @@ lib/
 ## 소셜 로그인 설정
 
 ### Google
-- Google Cloud Console → OAuth 2.0 클라이언트 ID (Android, 패키지명별 SHA-1 1개씩만 등록 가능 → 클라이언트 3개 분리 운용)
-  - **Android (Debug)**: Debug keystore SHA-1
-  - **Android Upload**: 업로드 키(`upload-keystore.jks`) SHA-1 — 직접 빌드한 릴리즈 APK 테스트용
-  - **Android Release**: Play Console 앱 서명 키 SHA-1 — 실제 플레이스토어 배포본용
+- Google Cloud Console → OAuth 2.0 클라이언트 ID
+  - Android (Debug): SHA-1 debug keystore
+  - Android (Release): SHA-1 app signing key (Play Console)
 - Supabase → Authentication → Providers → Google
 
 ### Kakao
-- Kakao Developers → 플랫폼 키 → 네이티브 앱 키 → Android 앱 정보
-  - 키 해시 3개 등록 필요: Debug / Upload / Release(앱 서명 키)
-  - 키 해시 추출: `keytool -exportcert -alias [별칭] -keystore [경로] -storepass [비번] | openssl sha1 -binary | openssl base64`
+- Kakao Developers → 플랫폼 키
+  - 네이티브 앱 키: `env.dart`의 `kakaoNativeAppKey`
+  - Android 앱 키 해시: debug + release 둘 다 등록
 - Supabase → Authentication → Providers → Kakao
-  - **REST API Key 칸에 네이티브 앱 키 입력** (이름은 REST API Key지만 실제로는 네이티브 앱 키를 넣어야 함 — 헷갈리기 쉬운 포인트)
+  - REST API Key 칸에 **네이티브 앱 키** 입력 (주의!)
   - Client Secret: 카카오 콘솔의 클라이언트 시크릿 코드
-  - `signInWithIdToken` 호출 시 `nonce` 파라미터는 넣지 않음 (넣으면 오류)
-
-### 키 해시/SHA-1 구분 정리
-| 키 종류 | 용도 | 추출 방법 |
-|---------|------|----------|
-| Debug | `flutter run` 디버그 모드 | `keytool ... debug.keystore` |
-| Upload | 로컬에서 직접 `flutter build apk/appbundle --release` 빌드 후 설치 테스트 | `keytool ... upload-keystore.jks` |
-| Release (앱 서명 키) | Play Console에서 실제 배포되는 APK (Google Play가 재서명) | Play Console → 앱 무결성 → 앱 서명 키 인증서 |
 
 ---
 
@@ -318,13 +288,9 @@ dart run flutter_launcher_icons
 # 스플래시 화면 생성
 dart run flutter_native_splash:create
 
-# 릴리즈 빌드 (버전 올리기 전 pubspec.yaml의 version 항목 먼저 수정!)
+# 릴리즈 빌드
 flutter build apk --release
-flutter build appbundle --release
 ```
-
-### MainActivity.kt 주의사항
-`FlutterActivity`를 `FlutterFragmentActivity`로 바꾸면 구글/카카오 로그인 콜백 처리가 깨져서 로그인이 안 됨(동의 화면까지는 뜨지만 세션이 저장되지 않고 로그인 화면으로 돌아옴). Edge-to-Edge 대응은 `FlutterActivity` 유지한 채로 `WindowCompat.setDecorFitsSystemWindows(window, false)`만 `onCreate`에서 호출하는 방식 사용.
 
 ---
 
@@ -335,11 +301,10 @@ flutter build appbundle --release
 | POST_NOTIFICATIONS | 알림 표시 |
 | SCHEDULE_EXACT_ALARM | 정확한 알람 예약 (API ≤ 32) |
 | USE_EXACT_ALARM | 정확한 알람 예약 (API ≥ 33) |
+| READ_MEDIA_IMAGES | 갤러리 저장 (API ≥ 33) |
 | WRITE_EXTERNAL_STORAGE | 갤러리 저장 (API ≤ 29) |
 | RECEIVE_BOOT_COMPLETED | 재부팅 후 알람 복구 |
 | INTERNET | 네트워크 통신 |
-
-> ⚠️ **READ_MEDIA_IMAGES는 사용하지 않음.** 갤러리 "쓰기(저장)" 전용 앱이라 "읽기" 권한이 불필요함. 한때 선언되어 있었으나 Google Play 정책 심사에서 미사용 권한으로 지적받아 제거함 (저장 기능은 권한 삭제 후에도 정상 동작 확인).
 
 ---
 

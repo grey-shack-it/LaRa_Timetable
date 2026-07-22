@@ -35,38 +35,17 @@ class ScheduleBlock extends StatelessWidget {
       left: 2,
       right: 2,
       height: blockHeight,
-      child: Draggable<Schedule>(
-        data: schedule,
-        feedback: Material(
-          color: Colors.transparent,
-          child: Opacity(
-            opacity: 0.85,
-            child: SizedBox(
-              width: 44,
-              height: blockHeight,
-              child: _buildBlockDesign(blockHeight),
-            ),
-          ),
-        ),
-        childWhenDragging: Obx(() {
+
+      child: GestureDetector(
+        onTap: onTap,
+        child: Obx(() {
           final isOverlap = controller.isOverlapView.value;
           final hasConflict = controller.isOverlappingWithOthers(schedule);
           return Opacity(
-            opacity: isOverlap && hasConflict ? 0.55 : 0.3,
+            opacity: isOverlap && hasConflict ? 0.75 : 1.0,
             child: _buildBlockDesign(blockHeight),
           );
         }),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Obx(() {
-            final isOverlap = controller.isOverlapView.value;
-            final hasConflict = controller.isOverlappingWithOthers(schedule);
-            return Opacity(
-              opacity: isOverlap && hasConflict ? 0.75 : 1.0,
-              child: _buildBlockDesign(blockHeight),
-            );
-          }),
-        ),
       ),
     );
   }

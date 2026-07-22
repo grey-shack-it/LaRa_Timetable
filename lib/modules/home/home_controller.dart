@@ -5,6 +5,7 @@ import '../../data/schedule.dart';
 import '../../data/child_profile.dart';
 import 'package:flutter/material.dart';
 import '../../services/alarm_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeController extends GetxController {
   final RxList<Schedule> schedules = <Schedule>[].obs;
@@ -166,6 +167,29 @@ class HomeController extends GetxController {
     );
 
     box.add(newSchedule);
+    // ✅ 로그인 상태면 Supabase에도 바로 추가
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      final existing = await Supabase.instance.client
+          .from('academy_info')
+          .select()
+          .eq('user_id', user.id)
+          .eq('child_id', selectedChildId.value)
+          .eq('name', title)
+          .maybeSingle();
+
+      if (existing == null) {
+        await Supabase.instance.client.from('academy_info').insert({
+          'user_id': user.id,
+          'child_id': selectedChildId.value,
+          'name': title,
+          'subject': title,
+          'fee': 0,
+          'payment_cycle': '매월',
+          'payment_day': 1,
+        });
+      }
+    }
     loadSchedules(); // ✅ 즉시 화면 갱신
     unawaited(AlarmService.registerScheduleAlarms(newSchedule)); // ✅ 알람은 백그라운드
   }
@@ -178,22 +202,6 @@ class HomeController extends GetxController {
       schedule.delete();
     }
     loadSchedules();
-  }
-
-  void updateScheduleTime(Schedule schedule, int day, double localY) {
-    int totalMinutes = localY.toInt();
-    int hour = totalMinutes ~/ 60;
-    int minute = (totalMinutes % 60) ~/ 10 * 10;
-
-    final duration = schedule.endTime.difference(schedule.startTime);
-
-    schedule.dayOfWeek = day;
-    schedule.startTime = DateTime(2024, 1, 1, hour.clamp(0, 23), minute);
-    schedule.endTime = schedule.startTime.add(duration);
-
-    schedule.save().then((_) {
-      refreshUI();
-    });
   }
 
   bool hasOverlap(
