@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../home_controller.dart';
 import '../../../constants/app_colors.dart';
 import '../../../data/schedule.dart';
+import 'schedule_dialog_helpers.dart';
 
 class ScheduleBlock extends StatelessWidget {
   final HomeController controller;
@@ -85,7 +86,7 @@ class ScheduleBlock extends StatelessWidget {
                 if (schedule.iconName != null)
                   Flexible(
                     child: Center(
-                      child: _buildAcademyIcon(
+                      child: buildAcademyIcon(
                         schedule.iconName!,
                         size: iconSize,
                       ),
@@ -143,31 +144,5 @@ class ScheduleBlock extends StatelessWidget {
         ),
       );
     });
-  }
-
-  Widget _buildAcademyIcon(String name, {required double size}) {
-    const Map<String, String> academyImages = {
-      '국어': 'ic_korean.png',
-      '영어': 'ic_english.png',
-      '수학': 'ic_math.png',
-      '미술': 'ic_art.png',
-      '태권도': 'ic_taekwondo.png',
-      '피아노': 'ic_piano.png',
-      '독서': 'ic_read.png',
-      '과학': 'ic_science.png',
-      '학교': 'ic_school.png',
-      '수영': 'ic_swimming.png',
-      '축구': 'ic_soccer.png',
-    };
-
-    final fileName = academyImages[name];
-    if (fileName == null) return const SizedBox.shrink();
-
-    return Image.asset(
-      'assets/icons/$fileName',
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-    );
   }
 }

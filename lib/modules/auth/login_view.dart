@@ -5,14 +5,17 @@ import '../../services/auth_service.dart';
 import '../academy/academy_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../home/home_view.dart';
+import '../home/home_controller.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightPurple,
+    final homeController = Get.find<HomeController>();
+
+    return Obx(() => Scaffold(
+      backgroundColor: homeController.bgColor.value,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -103,6 +106,6 @@ class LoginView extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

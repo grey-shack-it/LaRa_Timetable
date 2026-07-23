@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'home_controller.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:screenshot/screenshot.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:my_timeline_app/constants/app_colors.dart';
-import '../../services/image_save_service.dart';
 import 'widgets/profile_tab_bar.dart';
 import 'widgets/schedule_block.dart';
 import 'widgets/add_schedule_dialog.dart';
@@ -26,7 +25,6 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
-  final ScreenshotController screenshotController = ScreenshotController();
   late final HomeController controller;
 
   static const String _adUnitId = kDebugMode
@@ -63,90 +61,154 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightPurple,
-      appBar: AppBar(
-        // 1. 왼쪽(leading)에 로그인 버튼(앱 아이콘) 배치
-        leading: Center(
-          // Center로 감싸서 좌측 패딩 정렬을 예쁘게 잡아줍니다.
-          child: GestureDetector(
-            onTap: () {
-              if (AuthService.currentUser != null) {
-                Get.delete<AcademyController>(force: true);
-                Get.off(() => const AcademyView());
-              } else {
-                Get.to(() => const LoginView());
-              }
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/images/app_icon.png',
-                width: 38,
-                height: 38,
-                fit: BoxFit.cover,
+  // ✅ 배경색 변경 컬러피커 다이얼로그
+  void _showBgColorPicker() {
+    Color tempColor = controller.bgColor.value;
+    Get.dialog(
+      StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text(
+              '배경색 선택',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkPurple,
               ),
             ),
-          ),
-        ),
-
-        // 2. 가운데 제목 (기존 유지)
-        title: Obx(() {
-          final title = controller.isOverlapView.value
-              ? '아이들 시간표'
-              : '${controller.getProfileName(controller.selectedChildId.value)}의 시간표';
-          return Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w900,
-              color: AppColors.darkPurple,
-            ),
-          );
-        }),
-        centerTitle: true,
-        backgroundColor: AppColors.lightPurple,
-        elevation: 0,
-
-        // 3. 오른쪽(actions)에 이미지 저장 버튼 배치
-        actions: [
-          IconButton(
-            iconSize: 36,
-            icon: const Icon(Icons.image, color: AppColors.darkPurple),
-            onPressed: () => ImageSaveService.saveTimeTable(
-              screenshotController,
-              controller,
-            ),
-          ),
-          const SizedBox(width: 4), // 우측 여백 살짝 주기
-        ],
-      ),
-
-      // ✅ 광고 배너를 bottomNavigationBar로 이동 — SafeArea로 네비게이션바 겹침 방지
-      bottomNavigationBar: _isAdLoaded && _bannerAd != null
-          ? SafeArea(
+            content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(height: 1, color: AppColors.gridLine),
+                  ColorPicker(
+                    // ✅ 색이 바뀌면 key도 바뀌어서 위젯이 새로 그려짐 → '기본색상' 눌렀을 때 화면에도 바로 반영됨
+                    key: ValueKey(tempColor.value),
+                    pickerColor: tempColor,
+                    onColorChanged: (color) => tempColor = color,
+                    enableAlpha: false,
+                    labelTypes: const [],
+                  ),
+                  const SizedBox(height: 12),
                   SizedBox(
-                    width: _bannerAd!.size.width.toDouble(),
-                    height: _bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd!),
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.darkPurple),
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          tempColor = AppColors.lightPurple; // ✅ 원래 기본 배경색
+                        });
+                      },
+                      child: const Text(
+                        '기본색상',
+                        style: TextStyle(color: AppColors.darkPurple),
+                      ),
+                    ),
                   ),
                 ],
               ),
-            )
-          : null,
+            ),
+            actions: [
+              TextButton(onPressed: () => Get.back(), child: const Text('취소')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainPurple,
+                ),
+                onPressed: () {
+                  controller.setBgColor(tempColor);
+                  Get.back();
+                },
+                child: const Text('적용', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            ProfileTabBar(controller: controller),
-            Expanded(
-              child: Screenshot(
-                controller: screenshotController,
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final bg = controller.bgColor.value;
+      return Scaffold(
+        backgroundColor: bg,
+        appBar: AppBar(
+          // 1. 왼쪽(leading)에 로그인 버튼(앱 아이콘) 배치
+          leading: Center(
+            // Center로 감싸서 좌측 패딩 정렬을 예쁘게 잡아줍니다.
+            child: GestureDetector(
+              onTap: () {
+                if (AuthService.currentUser != null) {
+                  Get.delete<AcademyController>(force: true);
+                  Get.off(() => const AcademyView());
+                } else {
+                  Get.to(() => const LoginView());
+                }
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/images/app_icon.png',
+                  width: 38,
+                  height: 38,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+
+          // 2. 가운데 제목 (기존 유지)
+          title: Obx(() {
+            final title = controller.isOverlapView.value
+                ? '아이들 시간표'
+                : '${controller.getProfileName(controller.selectedChildId.value)}의 시간표';
+            return Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkPurple,
+              ),
+            );
+          }),
+          centerTitle: true,
+          backgroundColor: bg,
+          elevation: 0,
+
+          // 3. 오른쪽(actions)에 배경색 변경 버튼 배치
+          actions: [
+            IconButton(
+              iconSize: 32,
+              icon: const Icon(Icons.palette, color: AppColors.darkPurple),
+              onPressed: _showBgColorPicker,
+            ),
+            const SizedBox(width: 4), // 우측 여백 살짝 주기
+          ],
+        ),
+
+        // ✅ 광고 배너를 bottomNavigationBar로 이동 — SafeArea로 네비게이션바 겹침 방지
+        bottomNavigationBar: _isAdLoaded && _bannerAd != null
+            ? SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(height: 1, color: AppColors.gridLine),
+                    SizedBox(
+                      width: _bannerAd!.size.width.toDouble(),
+                      height: _bannerAd!.size.height.toDouble(),
+                      child: AdWidget(ad: _bannerAd!),
+                    ),
+                  ],
+                ),
+              )
+            : null,
+
+        body: SafeArea(
+          child: Column(
+            children: [
+              ProfileTabBar(controller: controller),
+              Expanded(
                 child: Column(
                   children: [
                     // 요일 헤더
@@ -299,17 +361,17 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
 
-      // ✅ + 버튼은 패딩 없이 그냥 사용 (bottomNavigationBar가 알아서 위에 배치)
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.mainPurple,
-        onPressed: () => AddScheduleDialog.show(context, controller),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
+        // ✅ + 버튼은 패딩 없이 그냥 사용 (bottomNavigationBar가 알아서 위에 배치)
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.mainPurple,
+          onPressed: () => AddScheduleDialog.show(context, controller),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+      );
+    });
   }
 }

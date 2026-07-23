@@ -135,7 +135,7 @@ class AddScheduleDialog {
                                     padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
                                       color: isSelected
-                                          ? AppColors.mainPurple
+                                          ? selectedColor.value
                                           : Colors.white,
                                       shape: BoxShape.circle,
                                       boxShadow: isSelected
