@@ -30,6 +30,7 @@ void main() async {
   Hive.registerAdapter(ChildProfileAdapter()); // ✅ 추가
   await Hive.openBox<Schedule>('schedules');
   await Hive.openBox<ChildProfile>('profiles'); // ✅ 추가
+  await Hive.openBox('settings'); // ✅ 배경색 등 앱 설정 저장용
 
   try {
     await AlarmService.init();

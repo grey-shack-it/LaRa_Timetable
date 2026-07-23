@@ -5,6 +5,7 @@ import 'academy_controller.dart';
 import 'academy_detail_controller.dart';
 import 'academy_detail_sections.dart';
 import 'academy_detail_payment.dart';
+import '../home/home_controller.dart';
 
 class AcademyDetailView extends StatelessWidget {
   final Map<String, dynamic> academy;
@@ -14,11 +15,12 @@ class AcademyDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctrl = Get.put(AcademyDetailController(academy: academy));
     final academyCtrl = Get.find<AcademyController>();
+    final homeController = Get.find<HomeController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightPurple,
+    return Obx(() => Scaffold(
+      backgroundColor: homeController.bgColor.value,
       appBar: AppBar(
-        backgroundColor: AppColors.lightPurple,
+        backgroundColor: homeController.bgColor.value,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.darkPurple),
@@ -234,6 +236,6 @@ class AcademyDetailView extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

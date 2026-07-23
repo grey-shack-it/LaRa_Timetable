@@ -15,8 +15,8 @@ class AcademyView extends StatelessWidget {
     final controller = Get.put(AcademyController(), permanent: false);
     final homeController = Get.find<HomeController>(); // 여기에 추가
 
-    return Scaffold(
-      backgroundColor: AppColors.lightPurple,
+    return Obx(() => Scaffold(
+      backgroundColor: homeController.bgColor.value,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.home, color: AppColors.darkPurple),
@@ -30,7 +30,7 @@ class AcademyView extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.lightPurple,
+        backgroundColor: homeController.bgColor.value,
         elevation: 0,
         actions: [
           // 기존 로그아웃 버튼
@@ -244,6 +244,6 @@ class AcademyView extends StatelessWidget {
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
-    );
+    ));
   }
 }

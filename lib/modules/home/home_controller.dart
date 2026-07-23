@@ -6,6 +6,7 @@ import '../../data/child_profile.dart';
 import 'package:flutter/material.dart';
 import '../../services/alarm_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../constants/app_colors.dart';
 
 class HomeController extends GetxController {
   final RxList<Schedule> schedules = <Schedule>[].obs;
@@ -17,6 +18,24 @@ class HomeController extends GetxController {
   final RxList<ChildProfile> profiles = <ChildProfile>[].obs;
   final RxString selectedChildId = ''.obs;
   final RxBool isOverlapView = false.obs;
+
+  // ✅ 앱 전체 공통 배경색 (홈/로그인/학원정보 목록/상세 화면에서 공유, Hive 'settings' 박스에 저장)
+  // HomeController가 permanent: true로 앱 시작 시 가장 먼저 생성되기 때문에
+  // 다른 화면들은 Get.find<HomeController>()로 이 값을 그대로 가져다 씁니다.
+  final Rx<Color> bgColor = AppColors.lightPurple.obs;
+
+  void loadBgColor() {
+    final box = Hive.box('settings');
+    final savedValue = box.get('bgColor');
+    if (savedValue != null) {
+      bgColor.value = Color(savedValue as int);
+    }
+  }
+
+  void setBgColor(Color color) {
+    bgColor.value = color;
+    Hive.box('settings').put('bgColor', color.value);
+  }
 
   static const List<Color> profileColors = [
     Color.fromARGB(255, 28, 207, 109),
@@ -56,6 +75,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadBgColor();
     loadProfiles();
     loadSchedules();
     Stream.periodic(const Duration(seconds: 1)).listen((_) {
